@@ -20,29 +20,39 @@ header {
   margin-bottom: 40px;
 }
 
-.moon {
-  font-size: 48px;
-  margin-bottom: 16px;
-}
-
-h1 {
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: 1px;
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   margin-bottom: 12px;
-  color: #f0e6ff;
 }
 
-.subtitle {
-  font-size: 18px;
-  color: #b8a9d4;
-  margin-bottom: 16px;
+.logo-icon {
+  font-size: 42px;
+  filter: drop-shadow(0 0 12px rgba(200, 160, 255, 0.3));
+}
+
+.logo-text {
+  font-size: 38px;
+  font-weight: 400;
+  letter-spacing: 6px;
+  color: #f0e6ff;
+  text-transform: uppercase;
+}
+
+.tagline {
+  font-size: 15px;
+  color: #8a7fa8;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
 }
 
 .desc {
-  font-size: 15px;
-  line-height: 1.6;
-  color: #8a7fa8;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #9a90b8;
 }
 
 .signup-form {
@@ -86,6 +96,7 @@ textarea {
 input:focus, textarea:focus {
   outline: none;
   border-color: #6b4c9a;
+  box-shadow: 0 0 0 3px rgba(107, 76, 154, 0.15);
 }
 
 textarea {
@@ -123,14 +134,14 @@ textarea {
   font-size: 18px;
   font-family: Georgia, serif;
   cursor: pointer;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   transition: transform 0.1s, box-shadow 0.2s;
   margin-top: 8px;
 }
 
 .cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(107, 76, 154, 0.4);
+  box-shadow: 0 4px 24px rgba(107, 76, 154, 0.5);
 }
 
 .cta:active {
