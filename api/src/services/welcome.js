@@ -19,7 +19,7 @@ STRUCTURE (follow exactly):
 
 ## ✨ Your Cosmic Blueprint
 
-[Opening — 2 sentences. Address them by name. Express genuine fascination about their chart. Make them feel seen immediately.]
+[Opening — 2-3 sentences. Address them by name. Explain that you looked at the exact sky at the moment they were born — the positions of the planets, the moon, the rising horizon — and that this cosmic snapshot shaped who they are. Make it feel like you're reading an ancient map that was drawn just for them.]
 
 ### The Big Three — Who You Are
 
@@ -41,13 +41,9 @@ STRUCTURE (follow exactly):
 
 [Connect their chart specifically to whatever focus area they chose — love, career, health, growth, or money. 3-4 sentences. Be specific to their placements.]
 
-### Your Number
-
-🔢 [ONE sentence about their numerological essence. Calculate their Life Path number from their birth date (add all digits until single digit or master number 11/22/33). Mention the number and what it means for them personally — tie it to their chart. Keep it mystical and brief.]
-
 ### What's Coming
 
-[Brief tease of what current transits mean for them specifically. Reference one real current transit hitting their chart. 2 sentences. End with a casual, warm invitation to reply — something like "Is there something on your mind you'd like me to look at in your chart? Just reply to this email." Keep it natural, like a friend offering to help — not a therapy prompt.]
+[Brief tease of what current transits mean for them specifically. Reference one real current transit hitting their chart. 2-3 sentences. Build anticipation for tomorrow's first daily reading. Do NOT ask them to reply or include any call-to-action.]
 
 ---
 

@@ -34,7 +34,7 @@ async function sweegoSend(body) {
 }
 
 
-export async function sendHoroscopeEmail(user, { subject, horoscope, nudge, question, lucky_number }, transitSummary = '') {
+export async function sendHoroscopeEmail(user, { subject, horoscope, lucky_number }, transitSummary = '') {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
 
   const techBlock = transitSummary ? `
@@ -49,8 +49,8 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, nudge, ques
         ${horoscope.replace(/\n/g, '<br>')}
       </p>
       ${lucky_number ? `<p style="font-size: 15px; color: #6b4c9a; margin: 20px 0;">🔢 Today's number: <strong>${lucky_number}</strong></p>` : ''}
-      <p style="font-size: 16px; line-height: 1.7; color: #4a3570; margin: 24px 0 0;">
-        ${nudge || question || ''}
+      <p style="font-size: 15px; color: #888; margin-top: 24px;">
+        <em>Questions? Want to dive deeper? Just reply to this email.</em>
       </p>
       ${techBlock}
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
@@ -67,7 +67,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, nudge, ques
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
     subject: subject,
     'message-html': htmlBody,
-    'message-txt': `${horoscope}\n\n${question}\n\nJust hit reply — I'm here.\n\nUnsubscribe: ${unsubUrl}`,
+    'message-txt': `${horoscope}\n\n${lucky_number ? 'Today\'s number: ' + lucky_number + '\n\n' : ''}Questions? Want to dive deeper? Just reply to this email.\n\nUnsubscribe: ${unsubUrl}`,
     'campaign-type': 'market',
     'dry-run': false,
   });
