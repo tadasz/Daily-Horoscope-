@@ -52,9 +52,11 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
         ${horoscope.replace(/\n/g, '<br>')}
       </p>
       ${numerology ? `
-      <div style="background: #f8f6fc; border-radius: 8px; padding: 14px 18px; margin: 24px 0; display: inline-block;">
-        <span style="font-size: 13px; color: #6b4c9a; letter-spacing: 0.5px;">
-          Your day: <strong>${numerology.personalDay}</strong> · Universal: <strong>${numerology.universalDay}</strong>
+      <div style="background: #f8f6fc; border-radius: 8px; padding: 14px 18px; margin: 24px 0;">
+        <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b4c9a; margin: 0 0 6px; font-weight: 600;">Today's Numbers</p>
+        <span style="font-size: 14px; color: #444; line-height: 1.6;">
+          🔢 Your personal day: <strong>${numerology.personalDay}</strong> <span style="color: #888; font-size: 12px;">— ${numerology.personalDayMeaning || ''}</span><br>
+          🌐 Universal energy: <strong>${numerology.universalDay}</strong> <span style="color: #888; font-size: 12px;">— ${numerology.universalDayMeaning || ''}</span>
         </span>
       </div>` : ''}
       <p style="font-size: 15px; color: #888; margin-top: 24px;">
@@ -76,7 +78,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
     subject: subject,
     'message-html': htmlBody,
     'message-txt': `${horoscope}\n\n${numerology ? `Your day: ${numerology.personalDay} · Universal: ${numerology.universalDay}\n\n` : ''}Questions? Want to dive deeper? Just reply to this email.\n\nUnsubscribe: ${unsubUrl}`,
-    'campaign-type': 'market',
+    'campaign-type': 'transac',
     'dry-run': false,
   });
 
