@@ -3,6 +3,7 @@ import { calculateNatalChart, getCurrentSky } from '../services/astrology.js';
 import { sendRichWelcomeEmail } from '../services/email.js';
 import { generateWelcomeReading } from '../services/welcome.js';
 import { birthProfile, personalYear, NUMBER_MEANINGS } from '../services/numerology.js';
+import { geocodeCity } from '../services/geocode.js';
 
 export async function subscribeRoute(req, res) {
   try {
@@ -22,15 +23,31 @@ export async function subscribeRoute(req, res) {
     const [year, month, day] = birth_date.split('-').map(Number);
     const [hour, minute] = birth_time ? birth_time.split(':').map(Number) : [12, 0];
 
+    // Geocode city if lat/lng not provided
+    let lat = birth_lat ? parseFloat(birth_lat) : null;
+    let lng = birth_lng ? parseFloat(birth_lng) : null;
+    let tz = timezone || null;
+
+    if ((!lat || !lng) && birth_city) {
+      const geo = await geocodeCity(birth_city);
+      if (geo) {
+        lat = geo.lat;
+        lng = geo.lng;
+        tz = tz || geo.timezone;
+        console.log(`📍 Geocoded "${birth_city}" → ${lat}, ${lng} (${tz})`);
+      }
+    }
+    tz = tz || 'UTC';
+
     // Calculate natal chart via astrology microservice
     let natalChart = null;
     try {
       natalChart = await calculateNatalChart({
         name,
         year, month, day, hour, minute,
-        lat: birth_lat ? parseFloat(birth_lat) : null,
-        lng: birth_lng ? parseFloat(birth_lng) : null,
-        tz: timezone || 'UTC',
+        lat,
+        lng,
+        tz,
       });
     } catch (err) {
       console.error('Natal chart calculation failed:', err.message);
@@ -46,9 +63,9 @@ export async function subscribeRoute(req, res) {
       email, name, birth_date,
       birth_time || null,
       birth_city || null,
-      birth_lat || null,
-      birth_lng || null,
-      timezone || 'UTC',
+      lat || null,
+      lng || null,
+      tz,
       natalChart ? JSON.stringify(natalChart) : null,
       natalChart?.sun_sign || null,
       natalChart?.moon_sign || null,

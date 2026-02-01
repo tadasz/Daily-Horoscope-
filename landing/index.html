@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GATO — Guided Astrology, Tailored for One</title>
-  <meta name="description" content="A daily horoscope that actually knows you. Real astrology grounded in planetary positions, written just for you.">
+  <title>GATO — Your Personal Daily Horoscope Email</title>
+  <meta name="description" content="A free daily horoscope email based on your actual birth chart. Real planetary positions, not generic zodiac fluff. Delivered every morning.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,7 +15,21 @@
         <span class="logo-text">GATO</span>
       </div>
       <p class="tagline">Guided Astrology, Tailored for One</p>
-      <p class="desc">Not generic zodiac fluff — real astrology, grounded in today's planetary positions, written just for you. Every morning in your inbox.</p>
+      
+      <h1>A daily horoscope email<br>written just for you</h1>
+      
+      <p class="desc">
+        Every morning, we read the sky and write you a short, 
+        personal reading based on your <em>actual birth chart</em> 
+        and today's planetary positions. Not generic zodiac fluff — 
+        real astrology, delivered to your inbox.
+      </p>
+      
+      <div class="how-it-works">
+        <div class="step">☽ <strong>We read your birth chart</strong> — the exact sky when you were born</div>
+        <div class="step">✨ <strong>Every morning, a personal email</strong> — your reading for the day</div>
+        <div class="step">🔢 <strong>Astrology + numerology</strong> — your daily number and cosmic energy</div>
+      </div>
     </header>
 
     <form action="/subscribe" method="POST" class="signup-form">
@@ -55,14 +69,9 @@
         </div>
       </div>
 
-      <div class="field">
-        <label for="context">What's on your mind lately? <span class="optional">(optional)</span></label>
-        <textarea id="context" name="context" rows="3" placeholder="A big decision, a worry, something exciting..."></textarea>
-      </div>
+      <button type="submit" class="cta">✨ Get My Free Daily Reading</button>
 
-      <button type="submit" class="cta">✨ Read My Stars</button>
-
-      <p class="fine-print">Free. Unsubscribe anytime. No spam, just stars.</p>
+      <p class="fine-print">100% free. One email per day. Unsubscribe anytime.</p>
     </form>
   </div>
 </body>
