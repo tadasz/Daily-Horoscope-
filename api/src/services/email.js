@@ -57,6 +57,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, question })
 
   const result = await sweegoSend({
     channel: 'email',
+    provider: 'sweego',
     recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
     subject: subject,
@@ -87,12 +88,13 @@ export async function sendFollowupEmail(user, followupText) {
 
   return sweegoSend({
     channel: 'email',
+    provider: 'sweego',
     recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
     subject: `Re: Your cosmic reading ✨`,
     'message-html': htmlBody,
     'message-txt': followupText,
-    'campaign-type': 'transactional',
+    'campaign-type': 'transac',
   });
 }
 
@@ -118,12 +120,13 @@ export async function sendPaywallReply(user) {
 
   return sweegoSend({
     channel: 'email',
+    provider: 'sweego',
     recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
     subject: `✨ Let me get to know you better`,
     'message-html': htmlBody,
     'message-txt': 'With Premium, I actually read and remember everything you tell me. Your horoscopes become deeply personal.',
-    'campaign-type': 'transactional',
+    'campaign-type': 'transac',
   });
 }
 
@@ -150,11 +153,12 @@ export async function sendWelcomeEmail(user) {
 
   return sweegoSend({
     channel: 'email',
+    provider: 'sweego',
     recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
     subject: `☽ Welcome, ${user.name} — your chart is ready`,
     'message-html': htmlBody,
     'message-txt': `Welcome, ${user.name}! I've looked at your chart — ${user.sun_sign} Sun. Starting tomorrow morning, you'll receive a personalized cosmic reading. See you under the stars. ☽`,
-    'campaign-type': 'transactional',
+    'campaign-type': 'transac',
   });
 }
