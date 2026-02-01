@@ -4,6 +4,7 @@ import pool from './db.js';
 import { subscribeRoute } from './routes/subscribe.js';
 import { webhookRoute } from './routes/webhook.js';
 import { unsubscribeRoute } from './routes/unsubscribe.js';
+import { testDailyRoute } from './routes/test.js';
 import { setupDailyCron } from './cron/dailyHoroscope.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, '../../landing')));
 app.post('/subscribe', subscribeRoute);
 app.post('/webhook/email', webhookRoute);
 app.get('/unsubscribe/:token', unsubscribeRoute);
+app.post('/test/daily', testDailyRoute);
 
 // Health check
 app.get('/health', async (req, res) => {

@@ -1,7 +1,7 @@
 /**
  * Horoscope generator — builds prompts and calls Claude to generate personalized readings.
  */
-import Anthropic from 'anthropic';
+import Anthropic from '@anthropic-ai/sdk';
 import config from '../config.js';
 
 const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
@@ -85,7 +85,7 @@ ${transitData.summary || 'Moon in ' + transitData.moon_sign + ' (' + transitData
 Generate their daily horoscope for today.`;
 
   const response = await anthropic.messages.create({
-    model: 'claude-haiku-4-20250404',
+    model: 'claude-sonnet-4-20250514',
     max_tokens: 500,
     system: isPremium ? SYSTEM_PREMIUM : SYSTEM_FREE,
     messages: [{ role: 'user', content: prompt }],
@@ -109,7 +109,7 @@ Their reply: "${replyText}"
 Generate a warm follow-up and extract a key insight.`;
 
   const response = await anthropic.messages.create({
-    model: 'claude-haiku-4-20250404',
+    model: 'claude-sonnet-4-20250514',
     max_tokens: 400,
     system: SYSTEM_FOLLOWUP,
     messages: [{ role: 'user', content: prompt }],

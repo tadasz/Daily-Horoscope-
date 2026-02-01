@@ -25,6 +25,16 @@ ASPECTS = [
 PLANET_NAMES = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]
 
 
+SIGN_FULL = {
+    "Ari": "Aries", "Tau": "Taurus", "Gem": "Gemini", "Can": "Cancer",
+    "Leo": "Leo", "Vir": "Virgo", "Lib": "Libra", "Sco": "Scorpio",
+    "Sag": "Sagittarius", "Cap": "Capricorn", "Aqu": "Aquarius", "Pis": "Pisces",
+}
+
+def _full_sign(abbr: str) -> str:
+    """Convert Kerykeion abbreviation to full sign name."""
+    return SIGN_FULL.get(abbr, abbr)
+
 def _extract_planet_data(subject: AstrologicalSubject) -> list:
     """Extract planet positions from a Kerykeion subject."""
     planets = []
@@ -38,29 +48,36 @@ def _extract_planet_data(subject: AstrologicalSubject) -> list:
     for attr, name in planet_attrs:
         planet = getattr(subject, attr, None)
         if planet:
+            sign = getattr(planet, "sign", "Unknown")
             planets.append({
                 "name": name,
-                "sign": planet.get("sign", "Unknown") if isinstance(planet, dict) else getattr(planet, "sign", "Unknown"),
-                "position": planet.get("position", 0) if isinstance(planet, dict) else getattr(planet, "position", 0),
-                "abs_pos": planet.get("abs_pos", 0) if isinstance(planet, dict) else getattr(planet, "abs_pos", 0),
-                "house": planet.get("house", "") if isinstance(planet, dict) else getattr(planet, "house", ""),
-                "retrograde": planet.get("retrograde", False) if isinstance(planet, dict) else getattr(planet, "retrograde", False),
+                "sign": _full_sign(sign),
+                "position": getattr(planet, "position", 0),
+                "abs_pos": getattr(planet, "abs_pos", 0),
+                "house": getattr(planet, "house", ""),
+                "retrograde": getattr(planet, "retrograde", False) or False,
             })
     
     return planets
 
 
+HOUSE_NAMES = [
+    "first_house", "second_house", "third_house", "fourth_house",
+    "fifth_house", "sixth_house", "seventh_house", "eighth_house",
+    "ninth_house", "tenth_house", "eleventh_house", "twelfth_house",
+]
+
 def _extract_houses(subject: AstrologicalSubject) -> list:
     """Extract house cusps from a Kerykeion subject."""
     houses = []
-    for i in range(1, 13):
-        house_attr = f"house_{i}" if hasattr(subject, f"house_{i}") else None
-        if house_attr:
-            house = getattr(subject, house_attr)
+    for i, attr_name in enumerate(HOUSE_NAMES, 1):
+        house = getattr(subject, attr_name, None)
+        if house:
             houses.append({
                 "house": i,
-                "sign": house.get("sign", "") if isinstance(house, dict) else getattr(house, "sign", ""),
-                "position": house.get("position", 0) if isinstance(house, dict) else getattr(house, "position", 0),
+                "sign": _full_sign(getattr(house, "sign", "")),
+                "position": getattr(house, "position", 0),
+                "abs_pos": getattr(house, "abs_pos", 0),
             })
     return houses
 

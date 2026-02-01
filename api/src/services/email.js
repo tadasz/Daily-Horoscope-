@@ -1,16 +1,25 @@
 /**
  * Email service — sends emails via Sweego (EU).
- * https://learn.sweego.io/docs/email/send-email
+ * https://www.sweego.io/send-email-sms-api-smtp
  */
 import config from '../config.js';
 
-const SWEEGO_API = 'https://api.sweego.io/v1';
+const SWEEGO_API = 'https://api.sweego.io';
 
-async function sweegoRequest(path, body) {
-  const res = await fetch(`${SWEEGO_API}${path}`, {
+async function sweegoSend(body) {
+  // If no API key configured, log the email instead of sending
+  if (!config.sweego.apiKey) {
+    console.log(`📧 [DRY RUN] Would send email to ${body.recipients?.[0]?.email}:`);
+    console.log(`   Subject: ${body.subject}`);
+    console.log(`   Body: ${(body['message-txt'] || '').substring(0, 100)}...`);
+    return { id: 'dry-run-' + Date.now(), status: 'dry_run' };
+  }
+
+  const res = await fetch(`${SWEEGO_API}/send`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       'Api-Key': config.sweego.apiKey,
     },
     body: JSON.stringify(body),
@@ -46,13 +55,15 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, question })
     </div>
   `;
 
-  const result = await sweegoRequest('/email/send', {
+  const result = await sweegoSend({
+    channel: 'email',
+    recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
-    to: [{ email: user.email, name: user.name }],
     subject: subject,
-    html: htmlBody,
-    // reply-to same address so Sweego inbound captures replies
-    reply_to: { email: config.sweego.fromEmail, name: config.sweego.fromName },
+    'message-html': htmlBody,
+    'message-txt': `${horoscope}\n\n${question}\n\nJust hit reply — I'm here.\n\nUnsubscribe: ${unsubUrl}`,
+    'campaign-type': 'market',
+    'dry-run': false,
   });
 
   return result;
@@ -74,12 +85,14 @@ export async function sendFollowupEmail(user, followupText) {
     </div>
   `;
 
-  return sweegoRequest('/email/send', {
+  return sweegoSend({
+    channel: 'email',
+    recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
-    to: [{ email: user.email, name: user.name }],
     subject: `Re: Your cosmic reading ✨`,
-    html: htmlBody,
-    reply_to: { email: config.sweego.fromEmail, name: config.sweego.fromName },
+    'message-html': htmlBody,
+    'message-txt': followupText,
+    'campaign-type': 'transactional',
   });
 }
 
@@ -103,11 +116,14 @@ export async function sendPaywallReply(user) {
     </div>
   `;
 
-  return sweegoRequest('/email/send', {
+  return sweegoSend({
+    channel: 'email',
+    recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
-    to: [{ email: user.email, name: user.name }],
     subject: `✨ Let me get to know you better`,
-    html: htmlBody,
+    'message-html': htmlBody,
+    'message-txt': 'With Premium, I actually read and remember everything you tell me. Your horoscopes become deeply personal.',
+    'campaign-type': 'transactional',
   });
 }
 
@@ -132,10 +148,13 @@ export async function sendWelcomeEmail(user) {
     </div>
   `;
 
-  return sweegoRequest('/email/send', {
+  return sweegoSend({
+    channel: 'email',
+    recipients: [{ email: user.email, name: user.name }],
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
-    to: [{ email: user.email, name: user.name }],
     subject: `☽ Welcome, ${user.name} — your chart is ready`,
-    html: htmlBody,
+    'message-html': htmlBody,
+    'message-txt': `Welcome, ${user.name}! I've looked at your chart — ${user.sun_sign} Sun. Starting tomorrow morning, you'll receive a personalized cosmic reading. See you under the stars. ☽`,
+    'campaign-type': 'transactional',
   });
 }
