@@ -15,6 +15,7 @@ body {
   width: 100%;
 }
 
+/* Logo */
 header {
   text-align: center;
   margin-bottom: 40px;
@@ -81,6 +82,7 @@ h1 {
   border-radius: 6px;
 }
 
+/* Form */
 .signup-form {
   display: flex;
   flex-direction: column;
@@ -97,6 +99,10 @@ h1 {
   font-size: 14px;
   color: #b8a9d4;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .optional {
@@ -104,6 +110,77 @@ h1 {
   font-size: 12px;
 }
 
+/* Tooltip */
+.tip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(107, 76, 154, 0.2);
+  color: #b8a9d4;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.tip-icon:hover {
+  background: rgba(107, 76, 154, 0.4);
+}
+
+.tip-text {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  background: #1e1e38;
+  border: 1px solid #3a3a5a;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #c8bfe0;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.tip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #3a3a5a;
+}
+
+.tip-wrap:hover .tip-text,
+.tip-wrap:focus-within .tip-text {
+  display: block;
+}
+
+/* Mobile: tap to toggle */
+@media (hover: none) {
+  .tip-icon {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tip-wrap:active .tip-text {
+    display: block;
+  }
+}
+
+/* Inputs */
 input[type="text"],
 input[type="email"],
 input[type="date"],
@@ -151,6 +228,7 @@ textarea {
   height: 16px;
 }
 
+/* CTA */
 .cta {
   background: linear-gradient(135deg, #6b4c9a 0%, #4a3570 100%);
   color: white;
@@ -178,4 +256,72 @@ textarea {
   text-align: center;
   font-size: 13px;
   color: #5a5070;
+}
+
+/* FAQ Section */
+.faq {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid #1a1a2e;
+}
+
+.faq h2 {
+  font-size: 22px;
+  font-weight: 400;
+  color: #f0e6ff;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+details {
+  border-bottom: 1px solid #1a1a2e;
+}
+
+summary {
+  padding: 16px 0;
+  font-size: 15px;
+  color: #b8a9d4;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::after {
+  content: '+';
+  font-size: 18px;
+  color: #6b4c9a;
+  flex-shrink: 0;
+  margin-left: 12px;
+  transition: transform 0.2s;
+}
+
+details[open] summary::after {
+  content: '−';
+}
+
+details p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #8a7fa8;
+  padding: 0 0 16px;
+}
+
+/* Footer */
+footer {
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid #1a1a2e;
+  text-align: center;
+}
+
+footer p {
+  font-size: 13px;
+  color: #4a4060;
+  line-height: 1.8;
 }

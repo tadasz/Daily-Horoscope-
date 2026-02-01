@@ -44,17 +44,36 @@
       </div>
 
       <div class="field">
-        <label for="birth_date">Date of birth</label>
+        <label for="birth_date">
+          Date of birth
+          <span class="tip-wrap">
+            <span class="tip-icon">?</span>
+            <span class="tip-text">Your birth date determines your Sun sign (core identity), Moon sign (emotions), and the planetary positions that shape your personality. It's the foundation of your entire chart.</span>
+          </span>
+        </label>
         <input type="date" id="birth_date" name="birth_date" required>
       </div>
 
       <div class="field">
-        <label for="birth_time">Time of birth <span class="optional">(optional — makes it more accurate)</span></label>
+        <label for="birth_time">
+          Time of birth
+          <span class="tip-wrap">
+            <span class="tip-icon">?</span>
+            <span class="tip-text">Your birth time determines your Rising sign — the constellation on the horizon the moment you arrived. It shapes how the world sees you and which life areas each planet influences. Even 30 minutes makes a difference. Don't know it? No worries — we'll use noon and still give you a great reading.</span>
+          </span>
+          <span class="optional">(optional)</span>
+        </label>
         <input type="time" id="birth_time" name="birth_time">
       </div>
 
       <div class="field">
-        <label for="birth_city">City of birth</label>
+        <label for="birth_city">
+          City of birth
+          <span class="tip-wrap">
+            <span class="tip-icon">?</span>
+            <span class="tip-text">Your birth location affects your Rising sign and house placements. Someone born the same minute in Tokyo and London will have different charts — the sky looks different from every point on Earth.</span>
+          </span>
+        </label>
         <input type="text" id="birth_city" name="birth_city" placeholder="e.g., Barcelona, Spain">
       </div>
 
@@ -73,6 +92,45 @@
 
       <p class="fine-print">100% free. One email per day. Unsubscribe anytime.</p>
     </form>
+
+    <section class="faq">
+      <h2>How is this different?</h2>
+      
+      <details>
+        <summary>What makes GATO different from other horoscopes?</summary>
+        <p>Most horoscopes are written for your Sun sign — one of 12 generic readings shared by ~600 million people. GATO calculates your full natal chart using the Swiss Ephemeris (the same tool professional astrologers use) and reads how today's actual planetary positions interact with <em>your</em> unique chart. Every reading is written for one person: you.</p>
+      </details>
+
+      <details>
+        <summary>What is a natal chart?</summary>
+        <p>A natal chart is a map of the sky at the exact moment and place you were born. It shows where every planet was — which zodiac sign, which degree, which "house" (life area). Think of it as your cosmic fingerprint. No two charts are alike unless you were born at the same time and place.</p>
+      </details>
+      
+      <details>
+        <summary>What do you mean by "real planetary positions"?</summary>
+        <p>We use astronomical ephemeris data — the same math NASA uses to track planets. When we say "Mars is squaring your natal Moon today," that's a real geometric relationship happening in the sky right now, relative to where the Moon was when you were born. Not vibes — math.</p>
+      </details>
+      
+      <details>
+        <summary>Why do you need my birth time and city?</summary>
+        <p>Your birth time determines your <strong>Rising sign</strong> (Ascendant) — which changes every ~2 hours. Your city determines which part of the sky was visible. Together, they set your "house system" — which planets rule which areas of your life (career, love, money, etc.). Without them, we can still give you a great reading, just less specific about life areas.</p>
+      </details>
+
+      <details>
+        <summary>What about the numerology?</summary>
+        <p>Each email includes numerology numbers calculated from your birth date and today's date. Your <strong>Life Path number</strong> (your life's purpose), <strong>Personal Day number</strong> (today's energy for you), and the <strong>Universal Day number</strong> (collective energy). All real Pythagorean numerology — no random numbers.</p>
+      </details>
+
+      <details>
+        <summary>Is it really free?</summary>
+        <p>Yes. You get a full birth chart reading when you sign up and a personalized daily horoscope every morning. Free forever. We may offer a premium tier later with deeper readings, but the daily email stays free.</p>
+      </details>
+    </section>
+
+    <footer>
+      <p>🐱 GATO — Guided Astrology, Tailored for One</p>
+      <p>Built with real astronomy. Powered by the Swiss Ephemeris.</p>
+    </footer>
   </div>
 </body>
 </html>
