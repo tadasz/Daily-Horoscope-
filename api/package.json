@@ -1,0 +1,16 @@
+{
+  "name": "horoscope-api",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "pg": "^8.13.0",
+    "node-cron": "^3.0.3",
+    "anthropic": "^0.52.0",
+    "uuid": "^10.0.0"
+  }
+}

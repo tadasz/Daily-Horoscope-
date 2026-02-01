@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: horoscope
+      POSTGRES_PASSWORD: horoscope
+      POSTGRES_DB: horoscope
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./api/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U horoscope"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  astro:
+    build: ./astro
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  api:
+    build: ./api
+    ports:
+      - "3001:3001"
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+      astro:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

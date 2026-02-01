@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cosmic Friend — Personalized Daily Horoscope</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="moon">☽</div>
+      <h1>Your Cosmic Friend</h1>
+      <p class="subtitle">A daily horoscope that actually knows you.</p>
+      <p class="desc">Not generic zodiac fluff — real astrology, grounded in today's planetary positions, written just for you. Every morning in your inbox.</p>
+    </header>
+
+    <form action="/subscribe" method="POST" class="signup-form">
+      <div class="field">
+        <label for="name">Your first name</label>
+        <input type="text" id="name" name="name" required placeholder="e.g., Tadas">
+      </div>
+
+      <div class="field">
+        <label for="email">Your email</label>
+        <input type="email" id="email" name="email" required placeholder="you@example.com">
+      </div>
+
+      <div class="field">
+        <label for="birth_date">Date of birth</label>
+        <input type="date" id="birth_date" name="birth_date" required>
+      </div>
+
+      <div class="field">
+        <label for="birth_time">Time of birth <span class="optional">(optional — makes it more accurate)</span></label>
+        <input type="time" id="birth_time" name="birth_time">
+      </div>
+
+      <div class="field">
+        <label for="birth_city">City of birth</label>
+        <input type="text" id="birth_city" name="birth_city" placeholder="e.g., Kaunas, Lithuania">
+      </div>
+
+      <div class="field">
+        <label>What area of life matters most to you right now?</label>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="focus_area" value="love"> Love & Relationships</label>
+          <label class="radio"><input type="radio" name="focus_area" value="career" checked> Career & Purpose</label>
+          <label class="radio"><input type="radio" name="focus_area" value="health"> Health & Energy</label>
+          <label class="radio"><input type="radio" name="focus_area" value="growth"> Personal Growth</label>
+          <label class="radio"><input type="radio" name="focus_area" value="money"> Money & Abundance</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="context">What's on your mind lately? <span class="optional">(optional)</span></label>
+        <textarea id="context" name="context" rows="3" placeholder="A big decision, a worry, something exciting..."></textarea>
+      </div>
+
+      <button type="submit" class="cta">✨ Start My Daily Horoscope</button>
+
+      <p class="fine-print">Free. Unsubscribe anytime. No spam, just stars.</p>
+    </form>
+  </div>
+</body>
+</html>
