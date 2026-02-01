@@ -34,7 +34,7 @@ async function sweegoSend(body) {
 }
 
 
-export async function sendHoroscopeEmail(user, { subject, horoscope }, transitSummary = '', numerology = null) {
+export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }, transitSummary = '', numerology = null) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
 
   const techBlock = transitSummary ? `
@@ -43,7 +43,10 @@ export async function sendHoroscopeEmail(user, { subject, horoscope }, transitSu
         <pre style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; line-height: 1.7; color: #555; margin: 0; white-space: pre-wrap;">${transitSummary.replace(/\n/g, '<br>')}</pre>
       </div>` : '';
   
+  const preheaderHtml = preheader ? `<div style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${preheader}</div>` : '';
+
   const htmlBody = `
+    ${preheaderHtml}
     <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 520px; margin: 0 auto; padding: 20px; color: #2d2d2d;">
       <p style="font-size: 17px; line-height: 1.7; margin-bottom: 20px;">
         ${horoscope.replace(/\n/g, '<br>')}
@@ -152,7 +155,7 @@ function mdToHtml(md) {
 }
 
 
-export async function sendRichWelcomeEmail(user, { subject, reading, technical_section, numerology }) {
+export async function sendRichWelcomeEmail(user, { subject, preheader, reading, technical_section, numerology }) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
 
   const readingHtml = mdToHtml(reading);
@@ -175,7 +178,10 @@ export async function sendRichWelcomeEmail(user, { subject, reading, technical_s
         </table>
       </div>` : '';
 
+  const preheaderHtml2 = preheader ? `<div style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${preheader}</div>` : '';
+
   const htmlBody = `
+    ${preheaderHtml2}
     <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 560px; margin: 0 auto; padding: 30px 20px; color: #2d2d2d;">
       
       <p style="font-size: 17px; line-height: 1.7; margin-bottom: 16px;">

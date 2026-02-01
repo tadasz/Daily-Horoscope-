@@ -15,9 +15,13 @@ Rules:
 - Use "you" — this is personal, not a newspaper column
 - Sound human and warm, not robotic or generic
 - Do NOT use the person's zodiac sign as a label ("Dear Scorpio...") — just talk to them
+- The subject and preheader must NOT repeat themes from previous emails (provided below)
+- Subject should hint at today's specific energy without being clickbaity
+
 Respond in this exact JSON format:
 {
-  "subject": "email subject line (include a real astro reference and their first name, use ☽ or ✨ emoji)",
+  "subject": "short subject line — personal, intriguing, hints at today's reading. Use ☽ or ✨. Do NOT include the date.",
+  "preheader": "one-sentence preview that gives a taste of the reading — makes them want to open it",
   "horoscope": "the horoscope text (under 80 words)"
 }`;
 
@@ -30,9 +34,11 @@ Rules:
 - Never doom-and-gloom — even challenging transits have growth angles
 - Use "you" — be intimate, not generic
 - Make them feel SEEN. This should feel eerily personal.
+- The subject and preheader must NOT repeat themes from previous emails (provided below)
 Respond in this exact JSON format:
 {
-  "subject": "email subject line (include a real astro reference and their first name)",
+  "subject": "short subject line — personal, intriguing, hints at today's reading",
+  "preheader": "one-sentence preview that gives a taste of the reading",
   "horoscope": "the deeply personalized horoscope text (under 120 words)"
 }`;
 
@@ -51,7 +57,7 @@ Respond in this exact JSON format:
 }`;
 
 
-export async function generateDailyHoroscope(user, transitData) {
+export async function generateDailyHoroscope(user, transitData, previousEmails = []) {
   const isPremium = user.subscription === 'premium';
   
   let userContext = `Name: ${user.name}\nSun sign: ${user.sun_sign}`;
@@ -71,11 +77,20 @@ export async function generateDailyHoroscope(user, transitData) {
     userContext += `\n\nThey initially said: "${user.initial_context}"`;
   }
 
+  // Include previous emails to avoid repetition
+  let prevContext = '';
+  if (previousEmails.length > 0) {
+    prevContext = '\n\nPrevious email subjects (do NOT repeat these themes):\n';
+    for (const e of previousEmails) {
+      prevContext += `- "${e.subject}"\n`;
+    }
+  }
+
   const prompt = `${userContext}
 
 Today's sky:
 ${transitData.summary || 'Moon in ' + transitData.moon_sign + ' (' + transitData.moon_phase + ')'}
-
+${prevContext}
 Generate their daily horoscope for today.`;
 
   const response = await anthropic.messages.create({

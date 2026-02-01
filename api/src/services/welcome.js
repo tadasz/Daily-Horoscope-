@@ -58,7 +58,8 @@ RULES:
 
 OUTPUT FORMAT — respond in this exact JSON:
 {
-  "subject": "email subject line (personal, include their name, use ☽ or ✨)",
+  "subject": "subject line — must include their name and one specific personal insight from their chart that makes them want to open it. Example: 'Tadas, your Aquarius Moon explains a lot' or 'Tadas — born under a waning crescent with Venus in Leo'. Make it feel like you already know something about them.",
+  "preheader": "one-sentence teaser that continues the subject — gives another personal detail. This shows as preview text in Gmail.",
   "reading": "the full reading in markdown (use the headers above)",
   "technical_section": "the raw technical data section (see below)"
 }

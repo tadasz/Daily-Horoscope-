@@ -55,15 +55,26 @@ export async function runDailyHoroscopes() {
         };
       }
 
+      // Fetch last 7 days of emails for this user (to avoid repetition)
+      const prevEmails = await query(
+        `SELECT subject FROM emails_sent WHERE user_id = $1 AND email_type = 'daily' ORDER BY sent_at DESC LIMIT 7`,
+        [user.id]
+      );
+
       // Generate horoscope via LLM
-      const horoscope = await generateDailyHoroscope(user, transitData);
+      const horoscope = await generateDailyHoroscope(user, transitData, prevEmails.rows);
+
+      // Prepend today's date to subject (e.g. "Feb 1 · ☽ Your career focus today")
+      const now = new Date();
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const datePrefix = `${monthNames[now.getUTCMonth()]} ${now.getUTCDate()}`;
+      horoscope.subject = `${datePrefix} · ${horoscope.subject}`;
 
       // Calculate numerology for today
-      const today = new Date();
       const birthDate = new Date(user.birth_date);
       const numData = dailyNumbers(
         birthDate.getUTCMonth() + 1, birthDate.getUTCDate(),
-        today.getUTCFullYear(), today.getUTCMonth() + 1, today.getUTCDate()
+        now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate()
       );
 
       // Send email with technical transit data + numerology
