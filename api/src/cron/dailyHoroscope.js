@@ -3,6 +3,7 @@ import { query } from '../db.js';
 import { getDailyTransits, getCurrentSky } from '../services/astrology.js';
 import { generateDailyHoroscope } from '../services/horoscope.js';
 import { sendHoroscopeEmail } from '../services/email.js';
+import { dailyNumbers } from '../services/numerology.js';
 import config from '../config.js';
 
 export function setupDailyCron() {
@@ -57,8 +58,16 @@ export async function runDailyHoroscopes() {
       // Generate horoscope via LLM
       const horoscope = await generateDailyHoroscope(user, transitData);
 
-      // Send email with technical transit data
-      const emailResult = await sendHoroscopeEmail(user, horoscope, transitData.summary || '');
+      // Calculate numerology for today
+      const today = new Date();
+      const birthDate = new Date(user.birth_date);
+      const numData = dailyNumbers(
+        birthDate.getUTCMonth() + 1, birthDate.getUTCDate(),
+        today.getUTCFullYear(), today.getUTCMonth() + 1, today.getUTCDate()
+      );
+
+      // Send email with technical transit data + numerology
+      const emailResult = await sendHoroscopeEmail(user, horoscope, transitData.summary || '', numData);
 
       // Log sent email
       await query(`

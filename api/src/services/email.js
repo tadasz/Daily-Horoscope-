@@ -34,7 +34,7 @@ async function sweegoSend(body) {
 }
 
 
-export async function sendHoroscopeEmail(user, { subject, horoscope, lucky_number }, transitSummary = '') {
+export async function sendHoroscopeEmail(user, { subject, horoscope }, transitSummary = '', numerology = null) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
 
   const techBlock = transitSummary ? `
@@ -48,7 +48,12 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, lucky_numbe
       <p style="font-size: 17px; line-height: 1.7; margin-bottom: 20px;">
         ${horoscope.replace(/\n/g, '<br>')}
       </p>
-      ${lucky_number ? `<p style="font-size: 15px; color: #6b4c9a; margin: 20px 0;">🔢 Today's number: <strong>${lucky_number}</strong></p>` : ''}
+      ${numerology ? `
+      <div style="background: #f8f6fc; border-radius: 8px; padding: 14px 18px; margin: 24px 0; display: inline-block;">
+        <span style="font-size: 13px; color: #6b4c9a; letter-spacing: 0.5px;">
+          Your day: <strong>${numerology.personalDay}</strong> · Universal: <strong>${numerology.universalDay}</strong>
+        </span>
+      </div>` : ''}
       <p style="font-size: 15px; color: #888; margin-top: 24px;">
         <em>Questions? Want to dive deeper? Just reply to this email.</em>
       </p>
@@ -67,7 +72,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, lucky_numbe
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
     subject: subject,
     'message-html': htmlBody,
-    'message-txt': `${horoscope}\n\n${lucky_number ? 'Today\'s number: ' + lucky_number + '\n\n' : ''}Questions? Want to dive deeper? Just reply to this email.\n\nUnsubscribe: ${unsubUrl}`,
+    'message-txt': `${horoscope}\n\n${numerology ? `Your day: ${numerology.personalDay} · Universal: ${numerology.universalDay}\n\n` : ''}Questions? Want to dive deeper? Just reply to this email.\n\nUnsubscribe: ${unsubUrl}`,
     'campaign-type': 'market',
     'dry-run': false,
   });
@@ -147,7 +152,7 @@ function mdToHtml(md) {
 }
 
 
-export async function sendRichWelcomeEmail(user, { subject, reading, technical_section }) {
+export async function sendRichWelcomeEmail(user, { subject, reading, technical_section, numerology }) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
 
   const readingHtml = mdToHtml(reading);
@@ -155,12 +160,29 @@ export async function sendRichWelcomeEmail(user, { subject, reading, technical_s
     .replace(/℞/g, '<span style="color: #c0392b;">℞</span>')
     .replace(/\n/g, '<br>');
 
+  const M = numerology?.meanings || {};
+  const numBlock = numerology ? `
+      <div style="background: #fdf6f0; border-radius: 8px; padding: 20px 24px; margin: 30px 0; border-left: 3px solid #c9873a;">
+        <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #c9873a; margin: 0 0 14px; font-weight: 600;">
+          Your Numbers
+        </p>
+        <table style="font-family: Georgia, serif; font-size: 15px; color: #444; border-collapse: collapse; width: 100%;">
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🔢 Life Path</td><td style="padding: 4px 0;"><strong>${numerology.lifePath}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.lifePath] || ''}</span></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🎂 Birthday</td><td style="padding: 4px 0;"><strong>${numerology.birthday}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.birthday] || ''}</span></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">✨ Expression</td><td style="padding: 4px 0;"><strong>${numerology.expression}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.expression] || ''}</span></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">💜 Soul Urge</td><td style="padding: 4px 0;"><strong>${numerology.soulUrge}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.soulUrge] || ''}</span></td></tr>
+          <tr style="border-top: 1px solid #e8d5c4;"><td style="padding: 8px 12px 4px 0; white-space: nowrap;">📅 Your 2026</td><td style="padding: 8px 0 4px;"><strong>${numerology.personalYear}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.personalYear] || ''}</span></td></tr>
+        </table>
+      </div>` : '';
+
   const htmlBody = `
     <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 560px; margin: 0 auto; padding: 30px 20px; color: #2d2d2d;">
       
       <p style="font-size: 17px; line-height: 1.7; margin-bottom: 16px;">
         ${readingHtml}
       </p>
+
+      ${numBlock}
 
       <div style="background: #f8f6fc; border-radius: 8px; padding: 20px 24px; margin: 30px 0; border-left: 3px solid #6b4c9a;">
         <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b4c9a; margin: 0 0 12px; font-weight: 600;">

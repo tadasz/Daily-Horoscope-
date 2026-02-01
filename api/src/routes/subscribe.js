@@ -2,6 +2,7 @@ import { query } from '../db.js';
 import { calculateNatalChart, getCurrentSky } from '../services/astrology.js';
 import { sendRichWelcomeEmail } from '../services/email.js';
 import { generateWelcomeReading } from '../services/welcome.js';
+import { birthProfile, personalYear, NUMBER_MEANINGS } from '../services/numerology.js';
 
 export async function subscribeRoute(req, res) {
   try {
@@ -64,11 +65,22 @@ export async function subscribeRoute(req, res) {
       let currentSky = null;
       try { currentSky = await getCurrentSky(); } catch (e) { /* ok */ }
 
+      // Calculate numerology profile
+      const numProfile = birthProfile(name, year, month, day);
+      const persYear = personalYear(month, day, new Date().getUTCFullYear());
+
       const welcomeData = await generateWelcomeReading(
         { name, focus_area, initial_context: context },
         natalChart,
         currentSky
       );
+
+      // Add numerology section to the welcome email
+      welcomeData.numerology = {
+        ...numProfile,
+        personalYear: persYear,
+        meanings: NUMBER_MEANINGS,
+      };
 
       await sendRichWelcomeEmail(
         { email, name, unsub_token: user.unsub_token },
