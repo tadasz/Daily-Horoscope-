@@ -47,7 +47,7 @@ STRUCTURE (follow exactly):
 
 ### What's Coming
 
-[Brief tease of what current transits mean for them specifically. Reference one real current transit hitting their chart. 2 sentences. End with anticipation for tomorrow's reading.]
+[Brief tease of what current transits mean for them specifically. Reference one real current transit hitting their chart. 2 sentences. End with a casual, warm invitation to reply — something like "Is there something on your mind you'd like me to look at in your chart? Just reply to this email." Keep it natural, like a friend offering to help — not a therapy prompt.]
 
 ---
 

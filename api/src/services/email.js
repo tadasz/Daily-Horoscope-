@@ -34,7 +34,7 @@ async function sweegoSend(body) {
 }
 
 
-export async function sendHoroscopeEmail(user, { subject, horoscope, question, lucky_number }, transitSummary = '') {
+export async function sendHoroscopeEmail(user, { subject, horoscope, nudge, question, lucky_number }, transitSummary = '') {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
 
   const techBlock = transitSummary ? `
@@ -48,12 +48,9 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, question, l
       <p style="font-size: 17px; line-height: 1.7; margin-bottom: 20px;">
         ${horoscope.replace(/\n/g, '<br>')}
       </p>
-      <p style="font-size: 17px; line-height: 1.7; font-style: italic; color: #6b4c9a; margin-bottom: 20px;">
-        ${question}
-      </p>
       ${lucky_number ? `<p style="font-size: 15px; color: #6b4c9a; margin: 20px 0;">🔢 Today's number: <strong>${lucky_number}</strong></p>` : ''}
-      <p style="font-size: 15px; color: #888; margin-top: 30px;">
-        <em>Just hit reply — I'm here.</em>
+      <p style="font-size: 16px; line-height: 1.7; color: #4a3570; margin: 24px 0 0;">
+        ${nudge || question || ''}
       </p>
       ${techBlock}
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">

@@ -68,7 +68,7 @@ export async function runDailyHoroscopes() {
         user.id,
         horoscope.subject,
         horoscope.horoscope,
-        horoscope.question,
+        horoscope.nudge || horoscope.question || '',
         transitData.summary || '',
         emailResult?.id || null,
       ]);
