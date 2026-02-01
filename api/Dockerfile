@@ -2,10 +2,11 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY api/package*.json ./
 RUN npm ci --production
 
-COPY . .
+COPY api/ .
+COPY landing/ /app/landing/
 
 EXPOSE 3001
 

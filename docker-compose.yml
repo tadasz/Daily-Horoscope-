@@ -28,7 +28,9 @@ services:
       retries: 3
 
   api:
-    build: ./api
+    build:
+      context: .
+      dockerfile: api/Dockerfile
     ports:
       - "3001:3001"
     env_file: .env

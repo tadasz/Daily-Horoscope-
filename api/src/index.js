@@ -16,7 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve landing page
-app.use(express.static(path.join(__dirname, '../../landing')));
+const landingDir = path.resolve(__dirname, '../landing');
+app.use(express.static(landingDir));
+app.get('/', (req, res) => res.sendFile('index.html', { root: landingDir }));
 
 // API routes
 app.post('/subscribe', subscribeRoute);
