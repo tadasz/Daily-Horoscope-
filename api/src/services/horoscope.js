@@ -21,7 +21,8 @@ Respond in this exact JSON format:
 {
   "subject": "email subject line (include a real astro reference and their first name, use ☽ or ✨ emoji)",
   "horoscope": "the horoscope text (under 80 words)",
-  "question": "the reflective question (starting with ✨)"
+  "question": "the reflective question (starting with ✨)",
+  "lucky_number": "a number 1-99 derived from today's date + their birth date numerology. Just the number."
 }`;
 
 const SYSTEM_PREMIUM = `You are a warm, knowledgeable astrologer who KNOWS this person. You've been talking with them.
@@ -39,7 +40,8 @@ Respond in this exact JSON format:
 {
   "subject": "email subject line (include a real astro reference and their first name)",
   "horoscope": "the deeply personalized horoscope text (under 120 words)",
-  "question": "the reflective question (starting with ✨)"
+  "question": "the reflective question (starting with ✨)",
+  "lucky_number": "a number 1-99 derived from today's date + their birth date numerology. Just the number."
 }`;
 
 const SYSTEM_FOLLOWUP = `You are their personal astrologer. They just replied to today's horoscope.

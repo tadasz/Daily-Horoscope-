@@ -41,6 +41,10 @@ STRUCTURE (follow exactly):
 
 [Connect their chart specifically to whatever focus area they chose — love, career, health, growth, or money. 3-4 sentences. Be specific to their placements.]
 
+### Your Number
+
+🔢 [ONE sentence about their numerological essence. Calculate their Life Path number from their birth date (add all digits until single digit or master number 11/22/33). Mention the number and what it means for them personally — tie it to their chart. Keep it mystical and brief.]
+
 ### What's Coming
 
 [Brief tease of what current transits mean for them specifically. Reference one real current transit hitting their chart. 2 sentences. End with anticipation for tomorrow's reading.]
