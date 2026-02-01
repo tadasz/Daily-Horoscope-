@@ -57,8 +57,8 @@ export async function runDailyHoroscopes() {
       // Generate horoscope via LLM
       const horoscope = await generateDailyHoroscope(user, transitData);
 
-      // Send email
-      const emailResult = await sendHoroscopeEmail(user, horoscope);
+      // Send email with technical transit data
+      const emailResult = await sendHoroscopeEmail(user, horoscope, transitData.summary || '');
 
       // Log sent email
       await query(`

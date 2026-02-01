@@ -1,6 +1,7 @@
 import { query } from '../db.js';
-import { calculateNatalChart } from '../services/astrology.js';
-import { sendWelcomeEmail } from '../services/email.js';
+import { calculateNatalChart, getCurrentSky } from '../services/astrology.js';
+import { sendRichWelcomeEmail } from '../services/email.js';
+import { generateWelcomeReading } from '../services/welcome.js';
 
 export async function subscribeRoute(req, res) {
   try {
@@ -32,7 +33,6 @@ export async function subscribeRoute(req, res) {
       });
     } catch (err) {
       console.error('Natal chart calculation failed:', err.message);
-      // Continue without chart — we can still use sun sign from date
     }
 
     // Insert user
@@ -58,15 +58,30 @@ export async function subscribeRoute(req, res) {
 
     const user = result.rows[0];
 
-    // Send welcome email
+    // Generate and send rich welcome email
     try {
-      await sendWelcomeEmail({
-        email, name,
-        sun_sign: natalChart?.sun_sign || 'your sign',
-        moon_sign: natalChart?.moon_sign,
-        rising_sign: natalChart?.rising_sign,
-        unsub_token: user.unsub_token,
-      });
+      // Get current sky for "What's Coming" section
+      let currentSky = null;
+      try { currentSky = await getCurrentSky(); } catch (e) { /* ok */ }
+
+      const welcomeData = await generateWelcomeReading(
+        { name, focus_area, initial_context: context },
+        natalChart,
+        currentSky
+      );
+
+      await sendRichWelcomeEmail(
+        { email, name, unsub_token: user.unsub_token },
+        welcomeData
+      );
+
+      // Log the welcome email
+      await query(`
+        INSERT INTO emails_sent (user_id, email_type, subject, body_text, question_asked)
+        VALUES ($1, 'welcome', $2, $3, $4)
+      `, [user.id, welcomeData.subject, welcomeData.reading, '']);
+
+      console.log(`✨ Welcome reading sent to ${email} (${natalChart?.sun_sign})`);
     } catch (err) {
       console.error('Welcome email failed:', err.message);
     }

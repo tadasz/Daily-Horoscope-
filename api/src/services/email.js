@@ -34,8 +34,14 @@ async function sweegoSend(body) {
 }
 
 
-export async function sendHoroscopeEmail(user, { subject, horoscope, question }) {
+export async function sendHoroscopeEmail(user, { subject, horoscope, question }, transitSummary = '') {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
+
+  const techBlock = transitSummary ? `
+      <div style="background: #f8f6fc; border-radius: 8px; padding: 16px 20px; margin: 24px 0; border-left: 3px solid #6b4c9a;">
+        <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b4c9a; margin: 0 0 8px; font-weight: 600;">Today's Sky</p>
+        <pre style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; line-height: 1.7; color: #555; margin: 0; white-space: pre-wrap;">${transitSummary.replace(/\n/g, '<br>')}</pre>
+      </div>` : '';
   
   const htmlBody = `
     <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 520px; margin: 0 auto; padding: 20px; color: #2d2d2d;">
@@ -48,6 +54,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, question })
       <p style="font-size: 15px; color: #888; margin-top: 30px;">
         <em>Just hit reply — I'm here.</em>
       </p>
+      ${techBlock}
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
       <p style="font-size: 12px; color: #aaa; text-align: center;">
         <a href="${unsubUrl}" style="color: #aaa;">Unsubscribe</a>
@@ -126,6 +133,65 @@ export async function sendPaywallReply(user) {
     subject: `✨ Let me get to know you better`,
     'message-html': htmlBody,
     'message-txt': 'With Premium, I actually read and remember everything you tell me. Your horoscopes become deeply personal.',
+    'campaign-type': 'transac',
+  });
+}
+
+
+function mdToHtml(md) {
+  return md
+    .replace(/### (.+)/g, '<h3 style="font-size: 18px; color: #6b4c9a; margin: 28px 0 12px; font-weight: 600;">$1</h3>')
+    .replace(/## (.+)/g, '<h2 style="font-size: 22px; color: #4a3570; margin: 0 0 20px; font-weight: 400; letter-spacing: 0.5px;">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p style="font-size: 17px; line-height: 1.7; margin-bottom: 16px;">')
+    .replace(/\n/g, '<br>');
+}
+
+
+export async function sendRichWelcomeEmail(user, { subject, reading, technical_section }) {
+  const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
+
+  const readingHtml = mdToHtml(reading);
+  const techHtml = technical_section
+    .replace(/℞/g, '<span style="color: #c0392b;">℞</span>')
+    .replace(/\n/g, '<br>');
+
+  const htmlBody = `
+    <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 560px; margin: 0 auto; padding: 30px 20px; color: #2d2d2d;">
+      
+      <p style="font-size: 17px; line-height: 1.7; margin-bottom: 16px;">
+        ${readingHtml}
+      </p>
+
+      <div style="background: #f8f6fc; border-radius: 8px; padding: 20px 24px; margin: 30px 0; border-left: 3px solid #6b4c9a;">
+        <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b4c9a; margin: 0 0 12px; font-weight: 600;">
+          Your Chart Data
+        </p>
+        <pre style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.8; color: #444; margin: 0; white-space: pre-wrap;">${techHtml}</pre>
+      </div>
+
+      <p style="font-size: 15px; color: #888; margin-top: 30px; text-align: center;">
+        <em>Tomorrow morning, your first daily reading arrives. ☽</em>
+      </p>
+
+      <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
+      <p style="font-size: 12px; color: #aaa; text-align: center;">
+        <a href="${unsubUrl}" style="color: #aaa;">Unsubscribe</a>
+      </p>
+    </div>
+  `;
+
+  const plainText = reading + '\n\n---\n\n' + technical_section + '\n\nUnsubscribe: ' + unsubUrl;
+
+  return sweegoSend({
+    channel: 'email',
+    provider: 'sweego',
+    recipients: [{ email: user.email, name: user.name }],
+    from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
+    subject: subject,
+    'message-html': htmlBody,
+    'message-txt': plainText,
     'campaign-type': 'transac',
   });
 }
