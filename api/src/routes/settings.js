@@ -14,7 +14,7 @@ export async function getSettingsRoute(req, res) {
     // Find user by unsub_token
     const result = await query(
       `SELECT name, language, focus_area, birth_date, birth_time, birth_city,
-              gender, quiz_style, quiz_length, quiz_relationship
+              gender, quiz_style, quiz_length, quiz_relationship, premium
        FROM users WHERE unsub_token = $1`,
       [token]
     );
@@ -36,6 +36,7 @@ export async function getSettingsRoute(req, res) {
       quiz_style: user.quiz_style,
       quiz_length: user.quiz_length,
       quiz_relationship: user.quiz_relationship,
+      premium: !!user.premium,
     });
     
   } catch (err) {

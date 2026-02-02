@@ -56,9 +56,19 @@ Tone: direct, empowering, bold — like a coach who also reads birth charts.`,
 
 const DEFAULT_STYLE = 'casual';
 
-function buildSystemPrompt(style, isLithuanian, isPremium) {
+const LENGTH_LIMITS = {
+  short: 80,
+  medium: 150,
+  long: 250,
+};
+
+function getWordLimit(isPremium, quizLength) {
+  if (!isPremium) return LENGTH_LIMITS.short; // free = always short
+  return LENGTH_LIMITS[quizLength] || LENGTH_LIMITS.medium; // premium default = medium
+}
+
+function buildSystemPrompt(style, isLithuanian, isPremium, wordLimit) {
   const s = STYLE_VOICES[style] || STYLE_VOICES[DEFAULT_STYLE];
-  const wordLimit = isPremium ? 120 : 80;
 
   if (isLithuanian) {
     // Lithuanian uses its own prompt (kept as-is for now)
@@ -170,9 +180,8 @@ Provokuoji veikti. Jokio rankų laikymo, jokio "gal pagalvok..."`,
   },
 };
 
-function buildSystemPromptLT(style, isPremium) {
+function buildSystemPromptLT(style, isPremium, wordLimit) {
   const s = STYLE_VOICES_LT[style] || STYLE_VOICES_LT['casual'];
-  const wordLimit = isPremium ? 120 : 80;
 
   return `Tu esi asmeninis kasdienės horoskopo rašytojas.
 
@@ -198,7 +207,7 @@ Atsakyk šiuo JSON formatu:
 }
 
 // Keep old constant as fallback
-const SYSTEM_FREE_LT = buildSystemPromptLT('casual', false);
+const SYSTEM_FREE_LT = buildSystemPromptLT('casual', false, 80);
 
 const SYSTEM_PREMIUM = `You are a warm, knowledgeable astrologer who KNOWS this person. You've been talking with them.
 Sound like a wise friend who sees their whole life through the lens of the stars.
@@ -315,11 +324,12 @@ ${prevContext}
 ${generateLabel}`;
 
   const userStyle = user.quiz_style || DEFAULT_STYLE;
+  const wordLimit = getWordLimit(isPremium, user.quiz_length);
   let systemPrompt;
   if (isLithuanian) {
-    systemPrompt = buildSystemPromptLT(userStyle, isPremium);
+    systemPrompt = buildSystemPromptLT(userStyle, isPremium, wordLimit);
   } else {
-    systemPrompt = buildSystemPrompt(userStyle, false, isPremium);
+    systemPrompt = buildSystemPrompt(userStyle, false, isPremium, wordLimit);
   }
 
   // Opus 4.5 for Lithuanian (best quality), Haiku for English (fast + cheap)

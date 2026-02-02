@@ -238,13 +238,13 @@
       <!-- Reading preferences -->
       <div class="section">
         <div class="section-title" id="sec_reading">Reading Preferences</div>
-        <div class="field">
-          <label id="lbl_length">Reading length</label>
+        <div class="field" id="lengthField">
+          <label id="lbl_length">Reading length <span class="premium-badge" id="premiumBadge" style="font-size:0.8em;color:#fbbf24;display:none;">✨ Premium</span></label>
           <select id="quiz_length" name="quiz_length">
             <option value="">—</option>
-            <option value="short">Short — quick cosmic hit</option>
-            <option value="medium">Medium — balanced</option>
-            <option value="long">Long — deep dive</option>
+            <option value="short">Short — quick cosmic hit (~80 words)</option>
+            <option value="medium">Medium — balanced (~150 words)</option>
+            <option value="long">Long — deep dive (~250 words)</option>
           </select>
         </div>
         <div class="field">
@@ -402,6 +402,12 @@
         document.getElementById('birth_time').value = data.birth_time || '';
         document.getElementById('birth_city').value = data.birth_city || '';
         document.getElementById('quiz_length').value = data.quiz_length || '';
+
+        // Length — premium only
+        if (!data.premium) {
+          document.getElementById('quiz_length').disabled = true;
+          document.getElementById('premiumBadge').style.display = 'inline';
+        }
 
         // Style
         if (data.quiz_style) {
