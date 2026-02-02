@@ -26,4 +26,7 @@ export default {
 
   // Cron
   cronHourUtc: parseInt(process.env.CRON_HOUR_UTC || '6'),
+  
+  // Admin
+  adminToken: process.env.ADMIN_TOKEN || 'gato-admin-2026',
 };

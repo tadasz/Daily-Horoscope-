@@ -3,9 +3,11 @@ import config from './config.js';
 import pool from './db.js';
 import { subscribeRoute } from './routes/subscribe.js';
 import { webhookRoute } from './routes/webhook.js';
+import webhookRouter from './routes/webhook.js';
 import { unsubscribeRoute } from './routes/unsubscribe.js';
 import { testDailyRoute } from './routes/test.js';
 import { getSettingsRoute, updateSettingsRoute } from './routes/settings.js';
+import adminRouter from './routes/admin.js';
 import { setupDailyCron } from './cron/dailyHoroscope.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -28,6 +30,8 @@ app.get('/lt', (req, res) => res.sendFile('index.html', { root: path.resolve(__d
 // API routes
 app.post('/subscribe', subscribeRoute);
 app.post('/webhook/email', webhookRoute);
+app.use('/webhook', webhookRouter);
+app.use('/admin', adminRouter);
 app.get('/unsubscribe/:token', unsubscribeRoute);
 app.post('/test/daily', testDailyRoute);
 app.get('/api/settings/:token', getSettingsRoute);
@@ -36,6 +40,14 @@ app.put('/api/settings/:token', updateSettingsRoute);
 // Settings page
 app.get('/settings/:token', (req, res) => {
   res.sendFile('settings.html', { root: landingDir });
+});
+
+// Admin dashboard
+app.get('/admin/dashboard', (req, res) => {
+  if (req.query.token !== (process.env.ADMIN_TOKEN || 'gato-admin-2026')) {
+    return res.status(401).send('Unauthorized');
+  }
+  res.sendFile('admin.html', { root: landingDir });
 });
 
 // Health check

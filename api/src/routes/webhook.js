@@ -1,7 +1,11 @@
+import { Router } from 'express';
 import { query } from '../db.js';
 import { generateFollowup } from '../services/horoscope.js';
 import { sendFollowupEmail, sendPaywallReply } from '../services/email.js';
 
+const router = Router();
+
+// POST /webhook/email — inbound email replies (existing functionality)
 export async function webhookRoute(req, res) {
   try {
     // Sweego inbound webhook delivers parsed email data
@@ -85,3 +89,49 @@ export async function webhookRoute(req, res) {
     res.status(500).json({ error: 'Processing failed' });
   }
 }
+
+// POST /webhook/sweego — receive Sweego email events
+router.post('/sweego', async (req, res) => {
+  try {
+    const events = Array.isArray(req.body) ? req.body : [req.body];
+    
+    for (const event of events) {
+      // Try to find the email by sweego_id or recipient
+      const eventType = event.event || event.type || event.event_type || 'unknown';
+      const recipientEmail = event.email || event.recipient || (event.recipients && event.recipients[0]?.email);
+      const messageId = event.message_id || event.sweego_id || event['message-id'];
+      
+      // Find user
+      let userId = null;
+      let emailId = null;
+      
+      if (messageId) {
+        const emailRow = await query('SELECT id, user_id FROM emails_sent WHERE sweego_id = $1', [messageId]);
+        if (emailRow.rows.length > 0) {
+          emailId = emailRow.rows[0].id;
+          userId = emailRow.rows[0].user_id;
+        }
+      }
+      
+      if (!userId && recipientEmail) {
+        const userRow = await query('SELECT id FROM users WHERE email = $1', [recipientEmail]);
+        if (userRow.rows.length > 0) userId = userRow.rows[0].id;
+      }
+      
+      // Store the event
+      await query(
+        'INSERT INTO email_events (user_id, email_id, event_type, event_data) VALUES ($1, $2, $3, $4)',
+        [userId, emailId, eventType, JSON.stringify(event)]
+      );
+      
+      console.log(`📬 Webhook event: ${eventType} for ${recipientEmail || messageId || 'unknown'}`);
+    }
+    
+    res.json({ status: 'ok' });
+  } catch (err) {
+    console.error('Webhook error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+export default router;
