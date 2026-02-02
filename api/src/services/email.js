@@ -97,6 +97,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
     'message-html': htmlBody,
     'message-txt': `${horoscope}\n\n${numerology ? `${personalDayPlain}: ${numerology.personalDay} · ${universalPlain}: ${numerology.universalDay}\n\n` : ''}${plainQuestionsText}\n\n${settingsText}: ${settingsUrl}\n${plainUnsubText}: ${unsubUrl}`,
     'campaign-type': 'transac',
+    headers: { 'Reply-To': config.sweego.replyEmail },
     'dry-run': false,
   });
 
@@ -128,6 +129,7 @@ export async function sendFollowupEmail(user, followupText) {
     'message-html': htmlBody,
     'message-txt': followupText,
     'campaign-type': 'transac',
+    headers: { 'Reply-To': config.sweego.replyEmail },
   });
 }
 
@@ -160,6 +162,7 @@ export async function sendPaywallReply(user) {
     'message-html': htmlBody,
     'message-txt': 'With Premium, I actually read and remember everything you tell me. Your horoscopes become deeply personal.',
     'campaign-type': 'transac',
+    headers: { 'Reply-To': config.sweego.replyEmail },
   });
 }
 
@@ -256,6 +259,7 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
     'message-html': htmlBody,
     'message-txt': plainText,
     'campaign-type': 'transac',
+    headers: { 'Reply-To': config.sweego.replyEmail },
   });
 }
 
@@ -289,5 +293,6 @@ export async function sendWelcomeEmail(user) {
     'message-html': htmlBody,
     'message-txt': `Welcome, ${user.name}! I've looked at your chart — ${user.sun_sign} Sun. Starting tomorrow morning, you'll receive a personalized cosmic reading. See you under the stars. ☽`,
     'campaign-type': 'transac',
+    headers: { 'Reply-To': config.sweego.replyEmail },
   });
 }

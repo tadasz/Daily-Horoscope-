@@ -11,6 +11,7 @@ export default {
     apiKey: process.env.SWEEGO_API_KEY || '',
     fromEmail: process.env.SWEEGO_FROM_EMAIL || 'stars@example.com',
     fromName: process.env.SWEEGO_FROM_NAME || 'Your Cosmic Friend',
+    replyEmail: process.env.SWEEGO_REPLY_EMAIL || 'stars@reply.gato.app',
     webhookSecret: process.env.SWEEGO_WEBHOOK_SECRET || '',
   },
 
