@@ -1,0 +1,14 @@
+{
+  "name": "horoscope-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:api": "node --test api/tests/*.test.js",
+    "test:ui": "npx playwright test",
+    "test": "npm run test:api && npm run test:ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.1"
+  }
+}
