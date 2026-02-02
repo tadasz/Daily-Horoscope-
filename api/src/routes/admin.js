@@ -102,4 +102,19 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// DELETE /admin/users/:email — remove a user completely
+router.delete('/users/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const result = await query('DELETE FROM users WHERE email = $1 RETURNING email, name', [email]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    console.log(`🗑️ Admin deleted user: ${result.rows[0].name} (${email})`);
+    res.json({ status: 'ok', deleted: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
