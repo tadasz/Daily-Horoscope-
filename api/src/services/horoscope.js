@@ -253,26 +253,39 @@ export async function generateDailyHoroscope(user, transitData, previousEmails =
     ? `Vardas: ${user.name}\nSaulės ženklas: ${user.sun_sign}`
     : `Name: ${user.name}\nSun sign: ${user.sun_sign}`;
   
-  if (isPremium) {
-    if (user.moon_sign) userContext += isLithuanian 
-      ? `\nMėnulio ženklas: ${user.moon_sign}`
-      : `\nMoon sign: ${user.moon_sign}`;
-    if (user.rising_sign) userContext += isLithuanian 
-      ? `\nKylantis ženklas: ${user.rising_sign}`
-      : `\nRising sign: ${user.rising_sign}`;
+  if (user.gender) userContext += `\nGender: ${user.gender}`;
+  if (user.birth_date) {
+    const bd = new Date(user.birth_date);
+    userContext += isLithuanian 
+      ? `\nGimimo data: ${bd.toISOString().split('T')[0]}`
+      : `\nBirth date: ${bd.toISOString().split('T')[0]}`;
   }
+  if (user.birth_city) userContext += isLithuanian 
+    ? `\nGimimo miestas: ${user.birth_city}`
+    : `\nBirth city: ${user.birth_city}`;
+  
+  if (user.moon_sign) userContext += isLithuanian 
+    ? `\nMėnulio ženklas: ${user.moon_sign}`
+    : `\nMoon sign: ${user.moon_sign}`;
+  if (user.rising_sign) userContext += isLithuanian 
+    ? `\nKylantis ženklas: ${user.rising_sign}`
+    : `\nRising sign: ${user.rising_sign}`;
   
   userContext += isLithuanian 
     ? `\nFokuso sritis: ${user.focus_area || 'bendras'}`
     : `\nFocus area: ${user.focus_area || 'general'}`;
   
-  if (isPremium && user.profile_notes) {
+  if (user.quiz_relationship) userContext += isLithuanian
+    ? `\nSantykių statusas: ${user.quiz_relationship}`
+    : `\nRelationship status: ${user.quiz_relationship}`;
+  
+  if (user.profile_notes) {
     userContext += isLithuanian 
       ? `\n\nKą apie juos žinau:\n${user.profile_notes}`
       : `\n\nWhat I know about them:\n${user.profile_notes}`;
   }
   
-  if (isPremium && user.initial_context) {
+  if (user.initial_context) {
     userContext += isLithuanian 
       ? `\n\nJie iš pradžių sakė: "${user.initial_context}"`
       : `\n\nThey initially said: "${user.initial_context}"`;

@@ -231,16 +231,24 @@ export async function generateWelcomeReading(user, natalChart, currentSky) {
   const aspects = natalChart.natal_aspects || [];
 
   const birthDate = user.birth_date ? new Date(user.birth_date) : null;
-  const birthYear = birthDate ? birthDate.getFullYear() : null;
+  const birthDateStr = birthDate ? birthDate.toISOString().split('T')[0] : null; // YYYY-MM-DD
 
   let chartData = `Name: ${user.name}\n`;
-  if (birthYear) chartData += `Born: ${birthYear}\n`;
+  if (user.gender) chartData += `Gender: ${user.gender}\n`;
+  if (birthDateStr) chartData += `Birth date: ${birthDateStr}\n`;
+  if (user.birth_time) chartData += `Birth time: ${user.birth_time}\n`;
+  if (user.birth_city) chartData += `Birth city: ${user.birth_city}\n`;
   chartData += `Sun: ${natalChart.sun_sign}, Moon: ${natalChart.moon_sign}, Rising: ${natalChart.rising_sign}\n`;
   chartData += `Moon phase at birth: ${natalChart.moon_phase_at_birth}\n`;
   chartData += `Focus area: ${user.focus_area || 'general growth'}\n`;
+  if (user.quiz_relationship) chartData += `Relationship status: ${user.quiz_relationship}\n`;
+  if (user.quiz_length) chartData += `Preferred reading length: ${user.quiz_length}\n`;
 
   if (user.initial_context) {
     chartData += `What's on their mind: "${user.initial_context}"\n`;
+  }
+  if (user.profile_notes) {
+    chartData += `What I know about them: ${user.profile_notes}\n`;
   }
 
   chartData += `\nPlanetary Positions:\n`;
