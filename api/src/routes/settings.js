@@ -13,7 +13,9 @@ export async function getSettingsRoute(req, res) {
     
     // Find user by unsub_token
     const result = await query(
-      'SELECT language, focus_area, birth_time, birth_city FROM users WHERE unsub_token = $1',
+      `SELECT name, language, focus_area, birth_date, birth_time, birth_city,
+              gender, quiz_style, quiz_length, quiz_relationship
+       FROM users WHERE unsub_token = $1`,
       [token]
     );
     
@@ -24,10 +26,16 @@ export async function getSettingsRoute(req, res) {
     const user = result.rows[0];
     
     res.json({
+      name: user.name,
       language: user.language || 'en',
       focus_area: user.focus_area,
+      birth_date: user.birth_date ? new Date(user.birth_date).toISOString().split('T')[0] : null,
       birth_time: user.birth_time,
-      birth_city: user.birth_city
+      birth_city: user.birth_city,
+      gender: user.gender,
+      quiz_style: user.quiz_style,
+      quiz_length: user.quiz_length,
+      quiz_relationship: user.quiz_relationship,
     });
     
   } catch (err) {
@@ -40,7 +48,7 @@ export async function getSettingsRoute(req, res) {
 export async function updateSettingsRoute(req, res) {
   try {
     const { token } = req.params;
-    const { language, focus_area, birth_time, birth_city } = req.body;
+    const { name, language, focus_area, birth_time, birth_city, birth_date, gender, quiz_style, quiz_length, quiz_relationship } = req.body;
     
     if (!token) {
       return res.status(400).json({ error: 'Token is required' });
@@ -60,8 +68,15 @@ export async function updateSettingsRoute(req, res) {
     let updateData = {
       language: language || 'en',
       focus_area: focus_area || null,
-      birth_time: birth_time || null
+      birth_time: birth_time || null,
     };
+    
+    if (name !== undefined) updateData.name = name || null;
+    if (gender !== undefined) updateData.gender = gender || null;
+    if (quiz_style !== undefined) updateData.quiz_style = quiz_style || null;
+    if (quiz_length !== undefined) updateData.quiz_length = quiz_length || null;
+    if (quiz_relationship !== undefined) updateData.quiz_relationship = quiz_relationship || null;
+    if (birth_date !== undefined) updateData.birth_date = birth_date || null;
     
     // If birth_city changed, we need to re-geocode and recalculate natal chart
     if (birth_city && birth_city !== user.birth_city) {
