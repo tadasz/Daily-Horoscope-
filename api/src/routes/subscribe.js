@@ -80,6 +80,13 @@ export async function subscribeRoute(req, res) {
     // Set initial status
     welcomeStatus.set(token, { status: 'generating', sun_sign: natalChart?.sun_sign });
 
+    // Track signup event
+    console.log(`📝 New signup: ${name} (${email}) — ${language || 'en'} — focus: ${focus_area || 'none'} — ${natalChart?.sun_sign || 'unknown'}`);
+    await query(
+      'INSERT INTO email_events (user_id, event_type, event_data) VALUES ($1, $2, $3)',
+      [user.id, 'signup', JSON.stringify({ name, email, language, focus_area, sun_sign: natalChart?.sun_sign })]
+    );
+
     // Generate and send welcome email IN BACKGROUND (don't block response)
     generateAndSendWelcome(user, { name, email, year, month, day, focus_area, context, language, natalChart, token })
       .catch(err => {
