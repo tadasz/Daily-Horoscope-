@@ -269,10 +269,10 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
             <td style="padding: 6px 12px 6px 0; white-space: nowrap; vertical-align: top;">💜 ${soulUrgeLabel}</td>
             <td style="padding: 6px 0;"><strong>${numerology.soulUrge}</strong> — ${M[numerology.soulUrge] || ''}<br><span style="color: #999; font-size: 12px;">${numExplanations.soulUrge}</span></td>
           </tr>
-          <tr style="border-top: 1px solid #e8d5c4;">
+          ${numerology.personalYear != null ? `<tr style="border-top: 1px solid #e8d5c4;">
             <td style="padding: 10px 12px 6px 0; white-space: nowrap; vertical-align: top;">📅 ${yearLabel}</td>
             <td style="padding: 10px 0 6px;"><strong>${numerology.personalYear}</strong> — ${M[numerology.personalYear] || ''}<br><span style="color: #999; font-size: 12px;">${numExplanations.personalYear}</span></td>
-          </tr>
+          </tr>` : ''}
         </table>
       </div>` : '';
 
