@@ -28,7 +28,7 @@ app.get('/', (req, res) => res.sendFile('index.html', { root: landingDir }));
 
 // Serve Lithuanian page
 app.use('/lt', express.static(path.resolve(__dirname, '../landing/lt')));
-app.get('/lt', (req, res) => res.sendFile('index.html', { root: path.resolve(__dirname, '../landing/lt') }));
+app.get('/lt', (req, res) => res.redirect('/?lang=lt'));
 
 // API routes
 app.post('/subscribe', subscribeRoute);

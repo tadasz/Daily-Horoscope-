@@ -2,169 +2,472 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GATO — Your Personal Daily Horoscope Email</title>
-  <meta name="description" content="A free daily horoscope email based on your actual birth chart. Real planetary positions, not generic zodiac fluff. Delivered every morning.">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>GATO — Your Personal Astrologer</title>
+  <meta name="description" content="Get a personalized daily horoscope based on your actual birth chart — not just your sun sign. Powered by real astronomy and AI.">
+  <meta property="og:title" content="GATO — Your Personal Astrologer">
+  <meta property="og:description" content="A personalized daily horoscope based on your actual birth chart.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gato.app">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* Nav */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,26,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1em; }
+    .nav-logo span:first-child { font-size: 1.3em; }
+    .nav-cta {
+      padding: 8px 20px; border-radius: 20px;
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff; font-size: 0.85em; font-weight: 600;
+      transition: transform 0.2s;
+    }
+    .nav-cta:hover { transform: scale(1.05); }
+
+    /* Sections */
+    section { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+      padding-top: 80px;
+    }
+    .hero-emoji { font-size: 4em; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .hero h1 {
+      font-size: clamp(2em, 6vw, 3em);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 1.15em;
+      color: #999;
+      max-width: 480px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 16px 36px;
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #fff; border-radius: 30px;
+      font-size: 1.1em; font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(124,58,237,0.3);
+    }
+    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,58,237,0.5); }
+    .hero-sub { margin-top: 16px; font-size: 0.85em; color: #555; }
+
+    /* Problem */
+    .problem { padding-top: 80px; padding-bottom: 80px; }
+    .problem h2 { font-size: 1.6em; text-align: center; margin-bottom: 32px; color: #c4b5fd; }
+    .problem-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .problem-card {
+      padding: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+    }
+    .problem-card .icon { font-size: 1.5em; margin-bottom: 8px; }
+    .problem-card h3 { font-size: 0.95em; margin-bottom: 6px; color: #e0e0e0; }
+    .problem-card p { font-size: 0.85em; color: #888; line-height: 1.5; }
+    @media (max-width: 500px) { .problem-grid { grid-template-columns: 1fr; } }
+
+    /* How it works */
+    .how { padding-top: 60px; padding-bottom: 80px; }
+    .how h2 { font-size: 1.6em; text-align: center; margin-bottom: 40px; color: #fbbf24; }
+    .steps { display: flex; flex-direction: column; gap: 24px; }
+    .step-row {
+      display: flex; align-items: flex-start; gap: 20px;
+    }
+    .step-num {
+      flex-shrink: 0; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(139,92,246,0.15);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 50%;
+      font-weight: 700; color: #c4b5fd; font-size: 1.1em;
+    }
+    .step-content h3 { font-size: 1em; margin-bottom: 4px; }
+    .step-content p { font-size: 0.9em; color: #888; }
+
+    /* Social proof */
+    .proof { padding-top: 60px; padding-bottom: 80px; }
+    .proof h2 { font-size: 1.6em; text-align: center; margin-bottom: 32px; color: #6ee7b7; }
+    .testimonials { display: flex; flex-direction: column; gap: 16px; }
+    .testimonial {
+      padding: 20px;
+      background: rgba(110,231,183,0.04);
+      border: 1px solid rgba(110,231,183,0.1);
+      border-radius: 12px;
+    }
+    .testimonial .quote { font-style: italic; color: #ccc; margin-bottom: 10px; font-size: 0.95em; line-height: 1.6; }
+    .testimonial .author { font-size: 0.82em; color: #6ee7b7; }
+
+    /* What you get */
+    .features { padding-top: 60px; padding-bottom: 80px; }
+    .features h2 { font-size: 1.6em; text-align: center; margin-bottom: 32px; color: #c4b5fd; }
+    .feature-list { display: flex; flex-direction: column; gap: 12px; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+    }
+    .feature-item .fi-icon { font-size: 1.3em; flex-shrink: 0; margin-top: 2px; }
+    .feature-item h3 { font-size: 0.95em; margin-bottom: 2px; }
+    .feature-item p { font-size: 0.85em; color: #888; }
+
+    /* Compare */
+    .compare { padding-top: 60px; padding-bottom: 80px; }
+    .compare h2 { font-size: 1.6em; text-align: center; margin-bottom: 32px; }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .compare-table th, .compare-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.9em;
+    }
+    .compare-table th { color: #888; font-weight: 400; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
+    .compare-table td:first-child { color: #aaa; }
+    .compare-table .col-them { color: #555; }
+    .compare-table .col-us { color: #fbbf24; font-weight: 600; }
+
+    /* CTA banner */
+    .cta-banner {
+      text-align: center;
+      padding: 60px 24px 80px;
+      max-width: 680px; margin: 0 auto;
+    }
+    .cta-banner h2 {
+      font-size: 1.8em; margin-bottom: 12px;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .cta-banner p { color: #888; margin-bottom: 28px; font-size: 1em; }
+
+    /* FAQ */
+    .faq { padding-top: 40px; padding-bottom: 80px; }
+    .faq h2 { font-size: 1.4em; text-align: center; margin-bottom: 28px; color: #999; }
+    .faq-item { border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .faq-q {
+      padding: 16px 0;
+      font-size: 0.95em; font-weight: 500;
+      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-q::after { content: '+'; color: #555; font-size: 1.2em; }
+    .faq-q.open::after { content: '−'; }
+    .faq-a {
+      display: none;
+      padding: 0 0 16px;
+      font-size: 0.88em; color: #888; line-height: 1.6;
+    }
+    .faq-a.open { display: block; }
+
+    /* Footer */
+    footer {
+      text-align: center; padding: 40px 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.8em; color: #444;
+    }
+    footer a { color: #555; margin: 0 8px; }
+    footer a:hover { color: #888; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">
-        <span class="logo-icon">🐱</span>
-        <span class="logo-text">GATO</span>
-      </div>
-      <p class="tagline">Guided Astrology, Tailored for One</p>
-      
-      <h1>A daily horoscope email<br>written just for you</h1>
-      
-      <p class="desc">
-        Every morning, we read the sky and write you a short, 
-        personal reading based on your <em>actual birth chart</em> 
-        and today's planetary positions. Not generic zodiac fluff — 
-        real astrology, delivered to your inbox.
-      </p>
-      
-      <div class="how-it-works">
-        <div class="step">☽ <strong>We read your birth chart</strong> — the exact sky when you were born</div>
-        <div class="step">✨ <strong>Every morning, a personal email</strong> — your reading for the day</div>
-        <div class="step">🔢 <strong>Astrology + numerology</strong> — your daily number and cosmic energy</div>
-      </div>
-    </header>
 
-    <form action="/subscribe" method="POST" class="signup-form">
-      <div class="field">
-        <label for="name">Your first name</label>
-        <input type="text" id="name" name="name" required placeholder="e.g., Luna">
-      </div>
+  <nav>
+    <div class="nav-logo">
+      <span>🐱</span>
+      <span style="color:#fbbf24;">GATO</span>
+    </div>
+    <a class="nav-cta" href="/quiz" id="nav-cta">Start free →</a>
+  </nav>
 
-      <div class="field">
-        <label for="email">Your email</label>
-        <input type="email" id="email" name="email" required placeholder="you@example.com">
-      </div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-emoji">🔭</div>
+    <h1 id="hero-title">Your stars.<br>Actually personal.</h1>
+    <p id="hero-desc">A daily horoscope based on your real birth chart — not just your sun sign. Powered by NASA data and AI that writes like a human astrologer.</p>
+    <a class="hero-cta" href="/quiz" id="hero-cta">
+      Take the 2-min quiz →
+    </a>
+    <p class="hero-sub" id="hero-sub">Free forever · No app to download · Arrives in your inbox</p>
+  </section>
 
-      <div class="field">
-        <label for="birth_date">
-          Date of birth
-          <span class="tip-wrap">
-            <span class="tip-icon">?</span>
-            <span class="tip-text">Your birth date determines your Sun sign (core identity), Moon sign (emotions), and the planetary positions that shape your personality. It's the foundation of your entire chart.</span>
-          </span>
-        </label>
-        <input type="date" id="birth_date" name="birth_date" required>
+  <!-- PROBLEM -->
+  <section class="problem">
+    <h2 id="problem-title">Generic horoscopes are boring</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">📰</div>
+        <h3 id="p1-title">One sign fits all</h3>
+        <p id="p1-desc">Newspaper horoscopes group 600M people under one label. Your chart has 10 planets, 12 houses, and dozens of aspects.</p>
       </div>
-
-      <div class="field">
-        <label for="birth_time">
-          Time of birth
-          <span class="tip-wrap">
-            <span class="tip-icon">?</span>
-            <span class="tip-text">Your birth time determines your Rising sign — the constellation on the horizon the moment you arrived. It shapes how the world sees you and which life areas each planet influences. Even 30 minutes makes a difference. Don't know it? No worries — we'll use noon and still give you a great reading.</span>
-          </span>
-          <span class="optional">(optional)</span>
-        </label>
-        <input type="time" id="birth_time" name="birth_time">
+      <div class="problem-card">
+        <div class="icon">🤖</div>
+        <h3 id="p2-title">Robotic & vague</h3>
+        <p id="p2-desc">"A good day for communication." Gee, thanks. We write like someone who actually looked at your chart.</p>
       </div>
-
-      <div class="field">
-        <label for="birth_city">
-          City of birth
-          <span class="tip-wrap">
-            <span class="tip-icon">?</span>
-            <span class="tip-text">Your birth location affects your Rising sign and house placements. Someone born the same minute in Tokyo and London will have different charts — the sky looks different from every point on Earth.</span>
-          </span>
-        </label>
-        <input type="text" id="birth_city" name="birth_city" placeholder="e.g., Barcelona, Spain">
+      <div class="problem-card">
+        <div class="icon">🔮</div>
+        <h3 id="p3-title">No real astronomy</h3>
+        <p id="p3-desc">Most horoscopes don't even use real planetary data. We calculate positions from NASA JPL ephemeris.</p>
       </div>
+      <div class="problem-card">
+        <div class="icon">📱</div>
+        <h3 id="p4-title">Yet another app</h3>
+        <p id="p4-desc">No app to install, no account to manage. Just a personal email that arrives every morning.</p>
+      </div>
+    </div>
+  </section>
 
-      <div class="field">
-        <label>What areas of life matter most to you right now?</label>
-        <div class="radio-group">
-          <label class="radio"><input type="checkbox" name="focus_area" value="love"> Love & Relationships</label>
-          <label class="radio"><input type="checkbox" name="focus_area" value="career" checked> Career & Purpose</label>
-          <label class="radio"><input type="checkbox" name="focus_area" value="health"> Health & Energy</label>
-          <label class="radio"><input type="checkbox" name="focus_area" value="growth"> Personal Growth</label>
-          <label class="radio"><input type="checkbox" name="focus_area" value="money"> Money & Abundance</label>
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <h2 id="how-title">How it works</h2>
+    <div class="steps">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3 id="s1-title">Take the quiz (2 min)</h3>
+          <p id="s1-desc">Choose your Oracle style, tell us your birth details, and pick what matters to you — love, career, health, or growth.</p>
         </div>
       </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3 id="s2-title">Get your cosmic blueprint</h3>
+          <p id="s2-desc">We calculate your real natal chart and write a personalized birth chart reading — your Big Three, cosmic gifts, and growth edges.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3 id="s3-title">Daily reading in your inbox</h3>
+          <p id="s3-desc">Every morning, an AI astrologer reads today's sky against your unique chart and writes you a personal horoscope.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      <button type="submit" class="cta">✨ Get My Free Daily Reading</button>
+  <!-- SOCIAL PROOF -->
+  <section class="proof">
+    <h2 id="proof-title">What people say</h2>
+    <div class="testimonials">
+      <div class="testimonial">
+        <p class="quote" id="t1-quote">"This is the first horoscope that's ever felt like it was actually about me, not some generic Gemini description."</p>
+        <p class="author" id="t1-author">— J.W., Gemini ☀️ Sagittarius 🌙</p>
+      </div>
+      <div class="testimonial">
+        <p class="quote" id="t2-quote">"I look forward to opening my email every morning now. The writing is beautiful and eerily accurate."</p>
+        <p class="author" id="t2-author">— A.K., Pisces ☀️ Cancer 🌙</p>
+      </div>
+      <div class="testimonial">
+        <p class="quote" id="t3-quote">"Finally, astrology that uses real data instead of making things up. The birth chart analysis was incredibly detailed."</p>
+        <p class="author" id="t3-author">— V.B., Aquarius ☀️ Virgo 🌙</p>
+      </div>
+    </div>
+  </section>
 
-      <p class="fine-print">100% free. One email per day. Unsubscribe anytime.</p>
-    </form>
+  <!-- WHAT YOU GET -->
+  <section class="features">
+    <h2 id="feat-title">What's included (free)</h2>
+    <div class="feature-list">
+      <div class="feature-item">
+        <span class="fi-icon">🗺️</span>
+        <div>
+          <h3 id="f1-title">Personalized birth chart</h3>
+          <p id="f1-desc">Full natal chart with all 10 planets, 12 houses, and your key aspects — calculated from real ephemeris data.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="fi-icon">📨</span>
+        <div>
+          <h3 id="f2-title">Daily personalized horoscope</h3>
+          <p id="f2-desc">Not copy-paste. Written fresh every day by AI that reads today's transits against YOUR chart.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="fi-icon">🔢</span>
+        <div>
+          <h3 id="f3-title">Numerology profile</h3>
+          <p id="f3-desc">Life path, expression, soul urge — calculated from your birth date and name.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="fi-icon">🎭</span>
+        <div>
+          <h3 id="f4-title">4 Oracle styles</h3>
+          <p id="f4-desc">Choose your voice: The Seer (poetic), The Strategist (data-driven), The Friend (warm), or The Commander (bold).</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <section class="faq">
-      <h2>How is this different?</h2>
-      
-      <details>
-        <summary>What makes GATO different from other horoscopes?</summary>
-        <p>Most horoscopes are written for your Sun sign — one of 12 generic readings shared by ~600 million people. GATO calculates your full natal chart using the Swiss Ephemeris (the same tool professional astrologers use) and reads how today's actual planetary positions interact with <em>your</em> unique chart. Every reading is written for one person: you.</p>
-      </details>
+  <!-- COMPARISON -->
+  <section class="compare">
+    <h2 id="cmp-title">GATO vs generic horoscopes</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="col-them" id="cmp-them">Typical</th>
+          <th class="col-us" id="cmp-us">GATO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td id="c1">Based on</td><td class="col-them">Sun sign only</td><td class="col-us">Full birth chart</td></tr>
+        <tr><td id="c2">Astronomy</td><td class="col-them">None</td><td class="col-us">NASA JPL data</td></tr>
+        <tr><td id="c3">Personalization</td><td class="col-them">1 of 12 signs</td><td class="col-us">Unique to you</td></tr>
+        <tr><td id="c4">Writing</td><td class="col-them">Template</td><td class="col-us">AI + your chart</td></tr>
+        <tr><td id="c5">Numerology</td><td class="col-them">❌</td><td class="col-us">✅ Included</td></tr>
+        <tr><td id="c6">Price</td><td class="col-them">Free</td><td class="col-us">Free</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-      <details>
-        <summary>What is a natal chart?</summary>
-        <p>A natal chart is a map of the sky at the exact moment and place you were born. It shows where every planet was — which zodiac sign, which degree, which "house" (life area). Think of it as your cosmic fingerprint. No two charts are alike unless you were born at the same time and place.</p>
-      </details>
-      
-      <details>
-        <summary>What do you mean by "real planetary positions"?</summary>
-        <p>We use astronomical ephemeris data — the same math NASA uses to track planets. When we say "Mars is squaring your natal Moon today," that's a real geometric relationship happening in the sky right now, relative to where the Moon was when you were born. Not vibes — math.</p>
-      </details>
-      
-      <details>
-        <summary>Why do you need my birth time and city?</summary>
-        <p>Your birth time determines your <strong>Rising sign</strong> (Ascendant) — which changes every ~2 hours. Your city determines which part of the sky was visible. Together, they set your "house system" — which planets rule which areas of your life (career, love, money, etc.). Without them, we can still give you a great reading, just less specific about life areas.</p>
-      </details>
+  <!-- FINAL CTA -->
+  <section class="cta-banner">
+    <h2 id="cta-title">Ready to meet your chart?</h2>
+    <p id="cta-desc">2 minutes. No app. Free forever.</p>
+    <a class="hero-cta" href="/quiz" id="cta-btn">Take the quiz →</a>
+  </section>
 
-      <details>
-        <summary>What about the numerology?</summary>
-        <p>Each email includes numerology numbers calculated from your birth date and today's date. Your <strong>Life Path number</strong> (your life's purpose), <strong>Personal Day number</strong> (today's energy for you), and the <strong>Universal Day number</strong> (collective energy). All real Pythagorean numerology — no random numbers.</p>
-      </details>
+  <!-- FAQ -->
+  <section class="faq">
+    <h2 id="faq-title">Questions</h2>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)" id="fq1">Is it really free?</div>
+      <div class="faq-a" id="fa1">Yes. The daily horoscope and birth chart are completely free, forever. We offer an optional Premium tier with longer readings and deeper insights, but the free version is genuinely useful on its own.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)" id="fq2">How is this different from Co-Star / other apps?</div>
+      <div class="faq-a" id="fa2">GATO delivers your horoscope via email — no app to download. Each reading is written fresh by AI specifically for your chart, not assembled from pre-written snippets. And you choose your Oracle's voice.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)" id="fq3">Do I need to know my birth time?</div>
+      <div class="faq-a" id="fa3">It helps! Birth time lets us calculate your Rising sign and house placements for a more accurate chart. But if you don't know it, we'll still give you a great reading based on your Sun and Moon.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)" id="fq4">Is my data safe?</div>
+      <div class="faq-a" id="fa4">We only store what's needed for your chart and readings. You can delete your account and all data at any time from Settings. We never sell your data.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)" id="fq5">Can I unsubscribe?</div>
+      <div class="faq-a" id="fa5">Yes, one click from any email. We also have a settings page where you can adjust preferences, change your Oracle, or delete your account entirely.</div>
+    </div>
+  </section>
 
-      <details>
-        <summary>Is it really free?</summary>
-        <p>Yes. You get a full birth chart reading when you sign up and a personalized daily horoscope every morning. Free forever. We may offer a premium tier later with deeper readings, but the daily email stays free.</p>
-      </details>
-    </section>
+  <footer>
+    <p>🐱 GATO — Personal Astrology, Tailored for One</p>
+    <p style="margin-top:8px;">
+      <a href="/quiz">Start quiz</a> ·
+      <a href="mailto:hello@gato.app">Contact</a>
+    </p>
+  </footer>
 
-    <footer>
-      <p>🐱 GATO — Guided Astrology, Tailored for One</p>
-      <p>Built with real astronomy. Powered by the Swiss Ephemeris.</p>
-    </footer>
-  </div>
   <script>
-    document.querySelector('.signup-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = {};
-      new FormData(form).forEach((v, k) => {
-        if (k === 'focus_area') {
-          data[k] = data[k] ? data[k] + ',' + v : v;
-        } else {
-          data[k] = v;
-        }
+    function toggleFaq(el) {
+      el.classList.toggle('open');
+      el.nextElementSibling.classList.toggle('open');
+    }
+
+    // Language detection
+    const params = new URLSearchParams(window.location.search);
+    const lang = params.get('lang') || (navigator.language?.startsWith('lt') ? 'lt' : 'en');
+
+    if (lang === 'lt') {
+      const quizUrl = '/quiz?lang=lt';
+      document.querySelectorAll('a[href="/quiz"]').forEach(a => a.href = quizUrl);
+
+      const t = {
+        'nav-cta': 'Pradėti nemokamai →',
+        'hero-title': 'Tavo žvaigždės.<br>Tikrai asmeniškai.',
+        'hero-desc': 'Kasdieninis horoskopas pagal tavo tikrą gimimo žemėlapį — ne tik Saulės ženklą. Paremtas NASA duomenimis ir AI, kuris rašo kaip tikras astrologas.',
+        'hero-cta': 'Pradėk 2 min viktoriną →',
+        'hero-sub': 'Nemokama visam laikui · Jokios programėlės · Ateina į el. paštą',
+        'problem-title': 'Bendriniai horoskopai yra nuobodūs',
+        'p1-title': 'Vienas ženklas visiems',
+        'p1-desc': 'Laikraščių horoskopai sugrupuoja 600M žmonių po vienu ženklu. Tavo žemėlapis turi 10 planetų, 12 namų ir dešimtis aspektų.',
+        'p2-title': 'Robotiškas ir miglotas',
+        'p2-desc': '"Gera diena bendravimui." Ačiū, labai padėjo. Mes rašome kaip žmogus, kuris tikrai pažvelgė į tavo žemėlapį.',
+        'p3-title': 'Jokios tikros astronomijos',
+        'p3-desc': 'Dauguma horoskopų nenaudoja tikrų planetų duomenų. Mes skaičiuojame pozicijas iš NASA JPL efemeridžių.',
+        'p4-title': 'Dar viena programėlė',
+        'p4-desc': 'Jokios programėlės, jokios paskyros. Tiesiog asmeninis laiškas kas rytą.',
+        'how-title': 'Kaip tai veikia',
+        's1-title': 'Užpildyk viktoriną (2 min)',
+        's1-desc': 'Pasirink savo Orakulo stilių, įvesk gimimo duomenis ir pasirink, kas tau svarbu — meilė, karjera, sveikata ar augimas.',
+        's2-title': 'Gauk kosminę schemą',
+        's2-desc': 'Apskaičiuojame tavo tikrą gimimo žemėlapį ir parašome asmeninį skaitymą — Didįjį Trejetą, kosmines dovanas ir augimo ribas.',
+        's3-title': 'Kasdieninis horoskopas į paštą',
+        's3-desc': 'Kiekvieną rytą AI astrologas skaito šiandieninį dangų tavo unikalaus žemėlapio kontekste ir parašo tau asmeninį horoskopą.',
+        'proof-title': 'Ką sako žmonės',
+        't1-quote': '"Tai pirmas horoskopas, kuris iš tikrųjų jaučiasi apie mane, o ne apie kažkokį bendrą Dvynių aprašymą."',
+        't2-quote': '"Dabar laukiu kas rytą atidaryti savo el. paštą. Rašymas gražus ir baugiai tikslus."',
+        't3-quote': '"Pagaliau astrologija, kuri naudoja tikrus duomenis, o ne išgalvoja. Gimimo žemėlapio analizė buvo neįtikėtinai detali."',
+        'feat-title': 'Ką gauni (nemokamai)',
+        'f1-title': 'Asmeninis gimimo žemėlapis',
+        'f1-desc': 'Pilnas žemėlapis su 10 planetų, 12 namų ir pagrindiniais aspektais — apskaičiuotas iš tikrų efemeridžių.',
+        'f2-title': 'Kasdieninis asmeninis horoskopas',
+        'f2-desc': 'Ne copy-paste. Parašytas kiekvieną dieną iš naujo pagal TAVO žemėlapį.',
+        'f3-title': 'Numerologijos profilis',
+        'f3-desc': 'Gyvenimo kelias, išraiška, sielos poreikis — apskaičiuota pagal gimimo datą ir vardą.',
+        'f4-title': '4 Orakulo stiliai',
+        'f4-desc': 'Pasirink balsą: Regėtoja (poetiška), Strategė (konkreti), Draugė (šilta) arba Vadė (tiesmuka).',
+        'cmp-title': 'GATO vs bendriniai horoskopai',
+        'cta-title': 'Pasiruošęs susitikti su savo žemėlapiu?',
+        'cta-desc': '2 minutės. Jokios programėlės. Nemokama visam laikui.',
+        'cta-btn': 'Pradėk viktoriną →',
+        'faq-title': 'Klausimai',
+        'fq1': 'Ar tikrai nemokama?',
+        'fa1': 'Taip. Kasdieninis horoskopas ir gimimo žemėlapis yra visiškai nemokami, visam laikui. Siūlome pasirenkamą Premium su ilgesniais skaitymais, bet nemokama versija yra tikrai naudinga pati savaime.',
+        'fq2': 'Kuo tai skiriasi nuo Co-Star / kitų programėlių?',
+        'fa2': 'GATO pristato horoskopą el. paštu — jokios programėlės. Kiekvienas skaitymas parašytas iš naujo AI specialiai tavo žemėlapiui, o ne surinktas iš paruoštų fragmentų.',
+        'fq3': 'Ar reikia žinoti gimimo laiką?',
+        'fa3': 'Padeda! Gimimo laikas leidžia apskaičiuoti Kylantį ženklą ir namų padėtis. Bet jei nežinai — vis tiek gausite puikų skaitymą pagal Saulę ir Mėnulį.',
+        'fq4': 'Ar mano duomenys saugūs?',
+        'fa4': 'Saugome tik tai, kas reikalinga žemėlapiui ir skaitymams. Gali ištrinti paskyrą ir visus duomenis bet kada per Nustatymus.',
+        'fq5': 'Ar galiu atsisakyti?',
+        'fa5': 'Taip, vienu paspaudimu iš bet kurio laiško. Taip pat yra nustatymų puslapis, kur gali keisti nuostatas arba ištrinti paskyrą.',
+      };
+
+      Object.entries(t).forEach(([id, html]) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
       });
-      const btn = form.querySelector('button');
-      btn.disabled = true;
-      btn.textContent = 'Reading the stars...';
-      fetch('/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      }).then(r => r.json()).then(d => {
-        if (d.token) {
-          window.location.href = '/welcome/' + d.token + '?lang=' + (data.language || 'en');
-        } else if (d.error) {
-          alert(d.error);
-          btn.disabled = false;
-          btn.textContent = '✨ Get My Free Daily Reading';
-        }
-      }).catch(() => {
-        alert('Something went wrong. Please try again.');
-        btn.disabled = false;
-        btn.textContent = '✨ Get My Free Daily Reading';
-      });
-    });
+    }
   </script>
 </body>
 </html>
