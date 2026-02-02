@@ -6,7 +6,18 @@ import config from '../config.js';
 
 const SWEEGO_API = 'https://api.sweego.io';
 
-async function sweegoSend(body) {
+async function sweegoSend(body, meta = {}) {
+  // Inject campaign-tags and metadata headers for tracking
+  if (meta.emailType) {
+    body['campaign-tags'] = [meta.emailType, meta.language || 'en'];
+  }
+  body.headers = {
+    ...body.headers,
+    'metadata-user-id': meta.userId || '',
+    'metadata-email-type': meta.emailType || '',
+    'metadata-language': meta.language || 'en',
+  };
+
   // If no API key configured, log the email instead of sending
   if (!config.sweego.apiKey) {
     console.log(`📧 [DRY RUN] Would send email to ${body.recipients?.[0]?.email}:`);
@@ -101,7 +112,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
     'campaign-type': 'transac',
     headers: { 'Reply-To': config.sweego.replyEmail },
     'dry-run': false,
-  });
+  }, { emailType: 'daily', language: user.language || 'en', userId: user.id || user.unsub_token });
 
   return result;
 }
@@ -133,7 +144,7 @@ export async function sendFollowupEmail(user, followupText) {
     'message-txt': followupText,
     'campaign-type': 'transac',
     headers: { 'Reply-To': config.sweego.replyEmail },
-  });
+  }, { emailType: 'followup', language: user.language || 'en', userId: user.id });
 }
 
 
@@ -166,7 +177,7 @@ export async function sendPaywallReply(user) {
     'message-txt': 'With Premium, I actually read and remember everything you tell me. Your horoscopes become deeply personal.',
     'campaign-type': 'transac',
     headers: { 'Reply-To': config.sweego.replyEmail },
-  });
+  }, { emailType: 'paywall', language: user.language || 'en', userId: user.id });
 }
 
 
@@ -265,7 +276,7 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
     'message-txt': plainText,
     'campaign-type': 'transac',
     headers: { 'Reply-To': config.sweego.replyEmail },
-  });
+  }, { emailType: 'welcome', language: user.language || 'en', userId: user.id || user.unsub_token });
 }
 
 
@@ -299,5 +310,5 @@ export async function sendWelcomeEmail(user) {
     'message-txt': `Welcome, ${user.name}! I've looked at your chart — ${user.sun_sign} Sun. Starting tomorrow morning, you'll receive a personalized cosmic reading. See you under the stars. ☽`,
     'campaign-type': 'transac',
     headers: { 'Reply-To': config.sweego.replyEmail },
-  });
+  }, { emailType: 'welcome-simple', language: 'en', userId: user.id });
 }
