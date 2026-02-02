@@ -41,6 +41,9 @@ router.post('/', async (req, res) => {
       body: JSON.stringify({
         product_id: config.creem.productId,
         success_url: `${appUrl}/checkout/success?token=${token}`,
+        customer: {
+          email: user.email,
+        },
         metadata: {
           user_id: String(user.id),
           unsub_token: token,
