@@ -1,7 +1,9 @@
 import { Router } from 'express';
+import crypto from 'crypto';
 import { query } from '../db.js';
 import { generateFollowup } from '../services/horoscope.js';
 import { sendFollowupEmail, sendPaywallReply } from '../services/email.js';
+import config from '../config.js';
 
 const router = Router();
 
@@ -93,6 +95,20 @@ export async function webhookRoute(req, res) {
 // POST /webhook/sweego — receive Sweego email events
 router.post('/sweego', async (req, res) => {
   try {
+    // Verify Sweego signature if secret is configured
+    const secret = config.sweego.webhookSecret;
+    if (secret) {
+      const signature = req.headers['x-webhook-signature'] || req.headers['x-sweego-signature'];
+      if (signature) {
+        const rawBody = JSON.stringify(req.body);
+        const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+        if (signature !== expected) {
+          console.warn('⚠️ Sweego webhook signature mismatch');
+          return res.status(401).json({ error: 'Invalid signature' });
+        }
+      }
+    }
+
     const events = Array.isArray(req.body) ? req.body : [req.body];
     
     for (const event of events) {
