@@ -3,7 +3,7 @@ import { query } from '../db.js';
 import { getDailyTransits, getCurrentSky } from '../services/astrology.js';
 import { generateDailyHoroscope } from '../services/horoscope.js';
 import { sendHoroscopeEmail } from '../services/email.js';
-import { dailyNumbers, NUMBER_MEANINGS } from '../services/numerology.js';
+import { dailyNumbers, NUMBER_MEANINGS, NUMBER_MEANINGS_LT } from '../services/numerology.js';
 import config from '../config.js';
 
 export function setupDailyCron() {
@@ -78,8 +78,9 @@ export async function runDailyHoroscopes() {
         birthDate.getUTCMonth() + 1, birthDate.getUTCDate(),
         now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate()
       );
-      numData.personalDayMeaning = NUMBER_MEANINGS[numData.personalDay] || '';
-      numData.universalDayMeaning = NUMBER_MEANINGS[numData.universalDay] || '';
+      const meanings = user.language === 'lt' ? NUMBER_MEANINGS_LT : NUMBER_MEANINGS;
+      numData.personalDayMeaning = meanings[numData.personalDay] || '';
+      numData.universalDayMeaning = meanings[numData.universalDay] || '';
 
       // Send email with technical transit data + numerology
       const emailResult = await sendHoroscopeEmail(user, horoscope, transitData.summary || '', numData);

@@ -2,7 +2,7 @@ import { query } from '../db.js';
 import { calculateNatalChart, getCurrentSky } from '../services/astrology.js';
 import { sendRichWelcomeEmail } from '../services/email.js';
 import { generateWelcomeReading } from '../services/welcome.js';
-import { birthProfile, personalYear, NUMBER_MEANINGS } from '../services/numerology.js';
+import { birthProfile, personalYear, NUMBER_MEANINGS, NUMBER_MEANINGS_LT } from '../services/numerology.js';
 import { geocodeCity } from '../services/geocode.js';
 
 export async function subscribeRoute(req, res) {
@@ -94,10 +94,11 @@ export async function subscribeRoute(req, res) {
       );
 
       // Add numerology section to the welcome email
+      const lang = language || 'en';
       welcomeData.numerology = {
         ...numProfile,
         personalYear: persYear,
-        meanings: NUMBER_MEANINGS,
+        meanings: lang === 'lt' ? NUMBER_MEANINGS_LT : NUMBER_MEANINGS,
       };
 
       await sendRichWelcomeEmail(

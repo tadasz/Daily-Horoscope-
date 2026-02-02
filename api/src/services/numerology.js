@@ -144,3 +144,18 @@ export const NUMBER_MEANINGS = {
   22: 'Master Builder, big vision',
   33: 'Master Teacher, healing',
 };
+
+export const NUMBER_MEANINGS_LT = {
+  1: 'Nauja pradžia, iniciatyva',
+  2: 'Partnerystė, pusiausvyra',
+  3: 'Kūrybiškumas, išraiška',
+  4: 'Struktūra, disciplina',
+  5: 'Pokyčiai, laisvė',
+  6: 'Harmonija, atsakomybė',
+  7: 'Apmąstymai, vidinė išmintis',
+  8: 'Galia, gausa',
+  9: 'Užbaigimas, atjauta',
+  11: 'Intuicija, dvasinis įžvalgumas',
+  22: 'Didysis Statytojas, didelė vizija',
+  33: 'Didysis Mokytojas, gydymas',
+};
