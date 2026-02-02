@@ -78,13 +78,13 @@
       </div>
 
       <div class="field">
-        <label>What area of life matters most to you right now?</label>
+        <label>What areas of life matter most to you right now?</label>
         <div class="radio-group">
-          <label class="radio"><input type="radio" name="focus_area" value="love"> Love & Relationships</label>
-          <label class="radio"><input type="radio" name="focus_area" value="career" checked> Career & Purpose</label>
-          <label class="radio"><input type="radio" name="focus_area" value="health"> Health & Energy</label>
-          <label class="radio"><input type="radio" name="focus_area" value="growth"> Personal Growth</label>
-          <label class="radio"><input type="radio" name="focus_area" value="money"> Money & Abundance</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="love"> Love & Relationships</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="career" checked> Career & Purpose</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="health"> Health & Energy</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="growth"> Personal Growth</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="money"> Money & Abundance</label>
         </div>
       </div>
 
@@ -132,5 +132,39 @@
       <p>Built with real astronomy. Powered by the Swiss Ephemeris.</p>
     </footer>
   </div>
+  <script>
+    document.querySelector('.signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {};
+      new FormData(form).forEach((v, k) => {
+        if (k === 'focus_area') {
+          data[k] = data[k] ? data[k] + ',' + v : v;
+        } else {
+          data[k] = v;
+        }
+      });
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Reading the stars...';
+      fetch('/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then(r => r.json()).then(d => {
+        if (d.token) {
+          window.location.href = '/welcome/' + d.token + '?lang=' + (data.language || 'en');
+        } else if (d.error) {
+          alert(d.error);
+          btn.disabled = false;
+          btn.textContent = '✨ Get My Free Daily Reading';
+        }
+      }).catch(() => {
+        alert('Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.textContent = '✨ Get My Free Daily Reading';
+      });
+    });
+  </script>
 </body>
 </html>

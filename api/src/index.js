@@ -1,7 +1,7 @@
 import express from 'express';
 import config from './config.js';
 import pool from './db.js';
-import { subscribeRoute } from './routes/subscribe.js';
+import { subscribeRoute, welcomeStatusRoute } from './routes/subscribe.js';
 import { webhookRoute } from './routes/webhook.js';
 import webhookRouter from './routes/webhook.js';
 import { unsubscribeRoute } from './routes/unsubscribe.js';
@@ -38,6 +38,12 @@ app.get('/unsubscribe/:token', unsubscribeRoute);
 app.post('/test/daily', testDailyRoute);
 app.get('/api/settings/:token', getSettingsRoute);
 app.put('/api/settings/:token', updateSettingsRoute);
+app.get('/api/welcome-status/:token', welcomeStatusRoute);
+
+// Welcome progress page
+app.get('/welcome/:token', (req, res) => {
+  res.sendFile('welcome.html', { root: landingDir });
+});
 
 // Settings page
 app.get('/settings/:token', (req, res) => {

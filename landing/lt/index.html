@@ -80,13 +80,13 @@
       </div>
 
       <div class="field">
-        <label>Kuri gyvenimo sritis tau svarbiausia dabar?</label>
+        <label>Kurios gyvenimo sritys tau svarbiausios dabar?</label>
         <div class="radio-group">
-          <label class="radio"><input type="radio" name="focus_area" value="love"> Meilė</label>
-          <label class="radio"><input type="radio" name="focus_area" value="career" checked> Karjera</label>
-          <label class="radio"><input type="radio" name="focus_area" value="health"> Sveikata</label>
-          <label class="radio"><input type="radio" name="focus_area" value="growth"> Asmeninis augimas</label>
-          <label class="radio"><input type="radio" name="focus_area" value="money"> Pinigai</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="love"> Meilė</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="career" checked> Karjera</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="health"> Sveikata</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="growth"> Asmeninis augimas</label>
+          <label class="radio"><input type="checkbox" name="focus_area" value="money"> Pinigai</label>
         </div>
       </div>
 
@@ -134,5 +134,39 @@
       <p>Sukurta su tikra astronomija. Varomai Swiss Ephemeris.</p>
     </footer>
   </div>
+  <script>
+    document.querySelector('.signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {};
+      new FormData(form).forEach((v, k) => {
+        if (k === 'focus_area') {
+          data[k] = data[k] ? data[k] + ',' + v : v;
+        } else {
+          data[k] = v;
+        }
+      });
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Skaitome žvaigždes...';
+      fetch('/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      }).then(r => r.json()).then(d => {
+        if (d.token) {
+          window.location.href = '/welcome/' + d.token + '?lang=' + (data.language || 'lt');
+        } else if (d.error) {
+          alert(d.error);
+          btn.disabled = false;
+          btn.textContent = '✨ Gauti nemokamą kasdieninį horoskopa';
+        }
+      }).catch(() => {
+        alert('Kažkas nutiko. Bandykite dar kartą.');
+        btn.disabled = false;
+        btn.textContent = '✨ Gauti nemokamą kasdieninį horoskopa';
+      });
+    });
+  </script>
 </body>
 </html>

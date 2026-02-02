@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GATO — Reading the Stars...</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .container {
+      text-align: center;
+      max-width: 480px;
+      padding: 40px 24px;
+    }
+    .orb {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, #8b5cf6, #3b0764);
+      box-shadow: 0 0 60px rgba(139, 92, 246, 0.4), 0 0 120px rgba(139, 92, 246, 0.15);
+      animation: pulse 2s ease-in-out infinite, float 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 60px rgba(139, 92, 246, 0.4), 0 0 120px rgba(139, 92, 246, 0.15); }
+      50% { box-shadow: 0 0 80px rgba(139, 92, 246, 0.6), 0 0 160px rgba(139, 92, 246, 0.25); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    h1 {
+      font-size: 1.5em;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .status-text {
+      color: #999;
+      font-size: 1.05em;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      min-height: 3em;
+    }
+    .steps {
+      text-align: left;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 0.95em;
+      color: #666;
+      transition: color 0.5s, opacity 0.5s;
+    }
+    .step.active { color: #c4b5fd; }
+    .step.done { color: #6ee7b7; }
+    .step-icon {
+      width: 24px;
+      text-align: center;
+      font-size: 1.1em;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      border-top-color: #8b5cf6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Done state */
+    .done-view { display: none; }
+    .done-view h1 { color: #6ee7b7; }
+    .done-emoji { font-size: 3em; margin-bottom: 16px; }
+    .check-email {
+      background: rgba(110, 231, 183, 0.1);
+      border: 1px solid rgba(110, 231, 183, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .check-email p { color: #999; font-size: 0.9em; margin-top: 8px; }
+    .spam-note {
+      color: #666;
+      font-size: 0.85em;
+      margin-top: 16px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Loading state -->
+    <div id="loading-view">
+      <div class="orb"></div>
+      <h1 id="title">Reading the stars...</h1>
+      <p class="status-text" id="status-text">We're calculating your unique cosmic blueprint</p>
+      
+      <div class="steps">
+        <div class="step active" id="step1">
+          <span class="step-icon"><span class="spinner"></span></span>
+          <span id="step1-text">Mapping your natal chart</span>
+        </div>
+        <div class="step" id="step2">
+          <span class="step-icon">○</span>
+          <span id="step2-text">Reading planetary aspects</span>
+        </div>
+        <div class="step" id="step3">
+          <span class="step-icon">○</span>
+          <span id="step3-text">Writing your personal reading</span>
+        </div>
+        <div class="step" id="step4">
+          <span class="step-icon">○</span>
+          <span id="step4-text">Sending to your inbox</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Done state -->
+    <div class="done-view" id="done-view">
+      <div class="done-emoji">✨</div>
+      <h1 id="done-title">Your cosmic blueprint is ready!</h1>
+      <div class="check-email">
+        <p style="font-size: 1.1em; color: #e0e0e0; margin: 0;" id="done-text">Check your email for your personalized reading</p>
+        <p id="done-sub">Your first daily horoscope arrives tomorrow morning</p>
+      </div>
+      <p class="spam-note" id="spam-note">📮 Don't see it? Check your spam/junk folder and mark GATO as "not spam"</p>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const lang = params.get('lang') || 'en';
+    const token = window.location.pathname.split('/').pop().split('?')[0];
+
+    // Lithuanian translations
+    const lt = {
+      title: 'Skaitome žvaigždes...',
+      statusText: 'Skaičiuojame tavo unikalų kosminį portretą',
+      step1: 'Braižome tavo gimimo horoskopą',
+      step2: 'Skaitome planetų aspektus',
+      step3: 'Rašome tavo asmeninį skaitymą',
+      step4: 'Siunčiame į tavo el. paštą',
+      doneTitle: 'Tavo kosminis portretas paruoštas!',
+      doneText: 'Tikrink savo el. paštą — ten tavęs laukia asmeninis skaitymas',
+      doneSub: 'Pirmasis kasdieninis horoskopas atkeliauja rytoj ryte',
+      spamNote: '📮 Nematai laiško? Patikrink šlamšto (spam) aplanką ir pažymėk GATO kaip „ne šlamštas"',
+    };
+
+    if (lang === 'lt') {
+      document.documentElement.lang = 'lt';
+      document.getElementById('title').textContent = lt.title;
+      document.getElementById('status-text').textContent = lt.statusText;
+      document.getElementById('step1-text').textContent = lt.step1;
+      document.getElementById('step2-text').textContent = lt.step2;
+      document.getElementById('step3-text').textContent = lt.step3;
+      document.getElementById('step4-text').textContent = lt.step4;
+      document.getElementById('done-title').textContent = lt.doneTitle;
+      document.getElementById('done-text').textContent = lt.doneText;
+      document.getElementById('done-sub').textContent = lt.doneSub;
+      document.getElementById('spam-note').textContent = lt.spamNote;
+    }
+
+    // Animate steps progressively while waiting
+    let currentStep = 1;
+    const stepTimers = [
+      setTimeout(() => advanceStep(2), 2000),
+      setTimeout(() => advanceStep(3), 5000),
+      setTimeout(() => advanceStep(4), 9000),
+    ];
+
+    function advanceStep(n) {
+      if (currentStep >= 5) return; // already done
+      for (let i = 1; i < n; i++) {
+        const el = document.getElementById(`step${i}`);
+        el.classList.remove('active');
+        el.classList.add('done');
+        el.querySelector('.step-icon').textContent = '✓';
+      }
+      const active = document.getElementById(`step${n}`);
+      if (active) {
+        active.classList.add('active');
+        active.querySelector('.step-icon').innerHTML = '<span class="spinner"></span>';
+      }
+      currentStep = n;
+    }
+
+    function showDone() {
+      currentStep = 5;
+      // Mark all steps done
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`step${i}`);
+        el.classList.remove('active');
+        el.classList.add('done');
+        el.querySelector('.step-icon').textContent = '✓';
+      }
+      // Short delay then show done view
+      setTimeout(() => {
+        document.getElementById('loading-view').style.display = 'none';
+        document.getElementById('done-view').style.display = 'block';
+      }, 800);
+    }
+
+    // Poll for status
+    let pollCount = 0;
+    const pollInterval = setInterval(async () => {
+      pollCount++;
+      try {
+        const res = await fetch(`/api/welcome-status/${token}`);
+        const data = await res.json();
+        if (data.status === 'sent') {
+          clearInterval(pollInterval);
+          showDone();
+        } else if (data.status === 'error') {
+          clearInterval(pollInterval);
+          showDone(); // Show done anyway — they'll still get daily emails
+        }
+      } catch (e) {}
+      // After 60s, just show done regardless
+      if (pollCount > 30) {
+        clearInterval(pollInterval);
+        showDone();
+      }
+    }, 2000);
+  </script>
+</body>
+</html>
