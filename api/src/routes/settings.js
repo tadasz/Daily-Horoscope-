@@ -75,9 +75,15 @@ export async function updateSettingsRoute(req, res) {
     if (name !== undefined) updateData.name = name || null;
     if (gender !== undefined) updateData.gender = gender || null;
     if (quiz_style !== undefined) updateData.quiz_style = quiz_style || null;
-    if (quiz_length !== undefined) updateData.quiz_length = quiz_length || null;
     if (quiz_relationship !== undefined) updateData.quiz_relationship = quiz_relationship || null;
     if (birth_date !== undefined) updateData.birth_date = birth_date || null;
+
+    // Length: free users forced to short
+    if (quiz_length !== undefined) {
+      const premResult = await query('SELECT premium FROM users WHERE id = $1', [user.id]);
+      const isPremium = premResult.rows[0]?.premium;
+      updateData.quiz_length = isPremium ? (quiz_length || 'short') : 'short';
+    }
     
     // If birth_city changed, we need to re-geocode and recalculate natal chart
     if (birth_city && birth_city !== user.birth_city) {
@@ -152,6 +158,38 @@ export async function updateSettingsRoute(req, res) {
     
   } catch (err) {
     console.error('Update settings error:', err);
+    res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+}
+
+// DELETE /api/settings/:token — delete user account
+export async function deleteAccountRoute(req, res) {
+  try {
+    const { token } = req.params;
+    if (!token) return res.status(400).json({ error: 'Token is required' });
+
+    const userResult = await query(
+      'SELECT id, email, name FROM users WHERE unsub_token = $1',
+      [token]
+    );
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = userResult.rows[0];
+
+    // Delete related data first
+    await query('DELETE FROM emails_sent WHERE user_id = $1', [user.id]);
+    await query('DELETE FROM email_events WHERE user_id = $1', [user.id]);
+    await query('DELETE FROM feedback WHERE user_id = $1', [user.id]);
+    await query('DELETE FROM replies WHERE user_id = $1', [user.id]);
+    await query('DELETE FROM users WHERE id = $1', [user.id]);
+
+    console.log(`🗑️ Account deleted: ${user.name} (${user.email})`);
+
+    res.json({ status: 'ok', message: 'Account deleted' });
+  } catch (err) {
+    console.error('Delete account error:', err);
     res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 }

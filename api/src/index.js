@@ -6,7 +6,7 @@ import { webhookRoute } from './routes/webhook.js';
 import webhookRouter from './routes/webhook.js';
 import { unsubscribeRoute } from './routes/unsubscribe.js';
 import { testDailyRoute } from './routes/test.js';
-import { getSettingsRoute, updateSettingsRoute } from './routes/settings.js';
+import { getSettingsRoute, updateSettingsRoute, deleteAccountRoute } from './routes/settings.js';
 import adminRouter from './routes/admin.js';
 import feedbackRouter from './routes/feedback.js';
 import checkoutRouter from './routes/checkout.js';
@@ -42,6 +42,7 @@ app.get('/unsubscribe/:token', unsubscribeRoute);
 app.post('/test/daily', testDailyRoute);
 app.get('/api/settings/:token', getSettingsRoute);
 app.put('/api/settings/:token', updateSettingsRoute);
+app.delete('/api/settings/:token', deleteAccountRoute);
 app.get('/api/welcome-status/:token', welcomeStatusRoute);
 
 // Quiz

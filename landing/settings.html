@@ -262,6 +262,13 @@
       <button type="submit" class="save-btn" id="saveBtn">Save Settings</button>
     </form>
 
+    <!-- Danger zone -->
+    <div class="section" style="border-color:rgba(220,38,38,0.15);margin-top:32px;">
+      <div class="section-title" style="color:#f87171;" id="sec_danger">Danger Zone</div>
+      <p style="font-size:0.85em;color:#888;margin-bottom:12px;" id="delete-desc">This will permanently delete your account and all your data. This action cannot be undone.</p>
+      <button id="deleteBtn" onclick="deleteAccount()" style="width:100%;padding:12px;border-radius:10px;background:rgba(220,38,38,0.1);border:1px solid rgba(220,38,38,0.3);color:#f87171;font-size:0.9em;font-weight:500;cursor:pointer;">Delete my account</button>
+    </div>
+
     <footer>
       <a href="/" id="backLink">← Back to GATO</a>
     </footer>
@@ -312,6 +319,11 @@
         len_short: 'Trumpas — greitas kosminis blyksnis',
         len_medium: 'Vidutinis — subalansuotas',
         len_long: 'Ilgas — gilus pasinėrimas',
+        sec_danger: 'Pavojinga zona',
+        delete_desc: 'Tai visam laikui ištrins tavo paskyrą ir visus duomenis. Šio veiksmo negalima atšaukti.',
+        deleteBtn: 'Ištrinti mano paskyrą',
+        delete_confirm: 'Ar tikrai nori ištrinti savo paskyrą? Šis veiksmas negrįžtamas.',
+        deleted: 'Paskyra ištrinta. Iki pasimatymo! 👋',
       }
     };
 
@@ -362,6 +374,11 @@
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.textContent = t[key];
       });
+
+      // Danger zone
+      set('sec_danger', t.sec_danger);
+      set('delete-desc', t.delete_desc);
+      set('deleteBtn', t.deleteBtn);
     }
 
     // Style card click handling
@@ -403,9 +420,11 @@
         document.getElementById('birth_city').value = data.birth_city || '';
         document.getElementById('quiz_length').value = data.quiz_length || '';
 
-        // Length — premium only
+        // Length — premium can choose, free locked to short
         if (!data.premium) {
-          document.getElementById('quiz_length').disabled = true;
+          const lenSelect = document.getElementById('quiz_length');
+          lenSelect.value = 'short';
+          lenSelect.disabled = true;
           document.getElementById('premiumBadge').style.display = 'inline';
         }
 
@@ -483,6 +502,30 @@
       el.style.display = 'block';
       if (type === 'success') setTimeout(() => el.style.display = 'none', 3000);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteAccount() {
+      const confirmMsg = lang === 'lt'
+        ? 'Ar tikrai nori ištrinti savo paskyrą? Šis veiksmas negrįžtamas.'
+        : 'Are you sure you want to delete your account? This cannot be undone.';
+      if (!confirm(confirmMsg)) return;
+
+      const btn = document.getElementById('deleteBtn');
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        const res = await fetch(`/api/settings/${token}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        
+        showToast('success', lang === 'lt' ? 'Paskyra ištrinta. Iki pasimatymo! 👋' : 'Account deleted. Goodbye! 👋');
+        setTimeout(() => { window.location.href = '/'; }, 2000);
+      } catch (e) {
+        showToast('error', e.message);
+        btn.disabled = false;
+        btn.textContent = lang === 'lt' ? 'Ištrinti mano paskyrą' : 'Delete my account';
+      }
     }
 
     if (!token || token === 'settings' || token === 'settings.html') {
