@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GATO — Feedback</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 40px 32px;
+    }
+    .logo { text-align: center; margin-bottom: 24px; }
+    .logo-icon { font-size: 2em; }
+    .logo-text { font-size: 1.4em; font-weight: 700; letter-spacing: 2px; margin-left: 8px; }
+    h1 { text-align: center; font-size: 1.3em; margin-bottom: 8px; }
+    .subtitle { text-align: center; color: #999; font-size: 0.95em; margin-bottom: 32px; }
+    
+    .stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; }
+    .star {
+      font-size: 2.2em;
+      cursor: pointer;
+      transition: transform 0.15s;
+      filter: grayscale(1) brightness(0.4);
+    }
+    .star:hover, .star.active { filter: none; transform: scale(1.2); }
+    .star.active ~ .star { filter: grayscale(1) brightness(0.4); }
+    
+    .stars-row { display: flex; flex-direction: row-reverse; justify-content: center; gap: 8px; margin-bottom: 28px; }
+    .stars-row .star:hover ~ .star { filter: none; }
+    
+    label { display: block; font-size: 0.9em; color: #aaa; margin-bottom: 8px; }
+    textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 12px;
+      color: #e0e0e0;
+      font-size: 1em;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 120px;
+      margin-bottom: 24px;
+    }
+    textarea:focus { outline: none; border-color: rgba(255,255,255,0.3); }
+    textarea::placeholder { color: #666; }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .thanks {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+    }
+    .thanks .emoji { font-size: 3em; margin-bottom: 16px; }
+    .thanks h2 { margin-bottom: 8px; }
+    .thanks p { color: #999; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <span class="logo-icon">🐱</span>
+      <span class="logo-text">GATO</span>
+    </div>
+    
+    <div id="form-view">
+      <h1 id="title">How are we doing?</h1>
+      <p class="subtitle" id="subtitle">Your feedback helps us make GATO better</p>
+      
+      <div class="stars-row" id="stars">
+        <span class="star" data-v="5">⭐</span>
+        <span class="star" data-v="4">⭐</span>
+        <span class="star" data-v="3">⭐</span>
+        <span class="star" data-v="2">⭐</span>
+        <span class="star" data-v="1">⭐</span>
+      </div>
+      
+      <label id="msg-label" for="message">Anything you'd like to tell us?</label>
+      <textarea id="message" placeholder="What do you like? What could be better?"></textarea>
+      
+      <button id="submit" onclick="send()">Send Feedback</button>
+    </div>
+    
+    <div class="thanks" id="thanks-view">
+      <div class="emoji">💜</div>
+      <h2 id="thanks-title">Thank you!</h2>
+      <p id="thanks-text">Your feedback means the world to us.</p>
+    </div>
+  </div>
+
+  <script>
+    const token = window.location.pathname.split('/').pop();
+    let rating = 0;
+
+    // Detect language from user settings
+    let lang = 'en';
+    fetch(`/api/settings/${token}`).then(r => r.json()).then(d => {
+      if (d.language === 'lt') {
+        lang = 'lt';
+        document.getElementById('title').textContent = 'Kaip mums sekasi?';
+        document.getElementById('subtitle').textContent = 'Tavo atsiliepimai padeda tobulinti GATO';
+        document.getElementById('msg-label').textContent = 'Ką norėtum mums pasakyti?';
+        document.getElementById('message').placeholder = 'Kas patinka? Ką galėtume pagerinti?';
+        document.getElementById('submit').textContent = 'Siųsti atsiliepimą';
+        document.getElementById('thanks-title').textContent = 'Ačiū!';
+        document.getElementById('thanks-text').textContent = 'Tavo atsiliepimai mums labai svarbūs.';
+        document.documentElement.lang = 'lt';
+      }
+    }).catch(() => {});
+
+    document.querySelectorAll('.star').forEach(s => {
+      s.addEventListener('click', () => {
+        rating = parseInt(s.dataset.v);
+        document.querySelectorAll('.star').forEach(x => {
+          x.classList.toggle('active', parseInt(x.dataset.v) <= rating);
+        });
+      });
+    });
+
+    async function send() {
+      const btn = document.getElementById('submit');
+      const msg = document.getElementById('message').value.trim();
+      btn.disabled = true;
+      btn.textContent = lang === 'lt' ? 'Siunčiama...' : 'Sending...';
+      
+      try {
+        await fetch(`/api/feedback/${token}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating, message: msg }),
+        });
+        document.getElementById('form-view').style.display = 'none';
+        document.getElementById('thanks-view').style.display = 'block';
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = lang === 'lt' ? 'Siųsti atsiliepimą' : 'Send Feedback';
+        alert('Something went wrong. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html>

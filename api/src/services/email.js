@@ -36,6 +36,7 @@ async function sweegoSend(body) {
 
 export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }, transitSummary = '', numerology = null) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
+  const feedbackUrl = `${config.appUrl}/feedback/${user.unsub_token}`;
   const settingsUrl = `${config.appUrl}/settings/${user.unsub_token}`;
   const isLithuanian = user.language === 'lt';
 
@@ -47,6 +48,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
     : 'Questions? Want to dive deeper? Just reply to this email.';
   const unsubText = isLithuanian ? 'Atsisakyti prenumeratos' : 'Unsubscribe';
   const settingsText = isLithuanian ? 'Nustatymai' : 'Settings';
+  const feedbackText = isLithuanian ? 'Atsiliepimai' : 'Feedback';
 
   const techBlock = transitSummary ? `
       <div style="background: #f8f6fc; border-radius: 8px; padding: 16px 20px; margin: 24px 0; border-left: 3px solid #6b4c9a;">
@@ -76,7 +78,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
       ${techBlock}
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
       <p style="font-size: 12px; color: #aaa; text-align: center;">
-        <a href="${settingsUrl}" style="color: #aaa;">${settingsText}</a> | <a href="${unsubUrl}" style="color: #aaa;">${unsubText}</a>
+        <a href="${feedbackUrl}" style="color: #aaa;">${feedbackText}</a> | <a href="${settingsUrl}" style="color: #aaa;">${settingsText}</a> | <a href="${unsubUrl}" style="color: #aaa;">${unsubText}</a>
       </p>
     </div>
   `;
@@ -107,6 +109,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
 
 export async function sendFollowupEmail(user, followupText) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
+  const feedbackUrl = `${config.appUrl}/feedback/${user.unsub_token}`;
   
   const htmlBody = `
     <div style="font-family: Georgia, 'Times New Roman', serif; max-width: 520px; margin: 0 auto; padding: 20px; color: #2d2d2d;">
@@ -180,6 +183,7 @@ function mdToHtml(md) {
 
 export async function sendRichWelcomeEmail(user, { subject, preheader, reading, technical_section, numerology }) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
+  const feedbackUrl = `${config.appUrl}/feedback/${user.unsub_token}`;
   const settingsUrl = `${config.appUrl}/settings/${user.unsub_token}`;
   const isLithuanian = user.language === 'lt';
 
@@ -201,6 +205,7 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
     : 'Tomorrow morning, your first daily reading arrives. ☽';
   const unsubText = isLithuanian ? 'Atsisakyti prenumeratos' : 'Unsubscribe';
   const settingsText = isLithuanian ? 'Nustatymai' : 'Settings';
+  const feedbackText = isLithuanian ? 'Atsiliepimai' : 'Feedback';
 
   const numBlock = numerology ? `
       <div style="background: #fdf6f0; border-radius: 8px; padding: 20px 24px; margin: 30px 0; border-left: 3px solid #c9873a;">
@@ -241,7 +246,7 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
 
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
       <p style="font-size: 12px; color: #aaa; text-align: center;">
-        <a href="${settingsUrl}" style="color: #aaa;">${settingsText}</a> | <a href="${unsubUrl}" style="color: #aaa;">${unsubText}</a>
+        <a href="${feedbackUrl}" style="color: #aaa;">${feedbackText}</a> | <a href="${settingsUrl}" style="color: #aaa;">${settingsText}</a> | <a href="${unsubUrl}" style="color: #aaa;">${unsubText}</a>
       </p>
     </div>
   `;

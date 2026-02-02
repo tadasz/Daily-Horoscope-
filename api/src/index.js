@@ -8,6 +8,7 @@ import { unsubscribeRoute } from './routes/unsubscribe.js';
 import { testDailyRoute } from './routes/test.js';
 import { getSettingsRoute, updateSettingsRoute } from './routes/settings.js';
 import adminRouter from './routes/admin.js';
+import feedbackRouter from './routes/feedback.js';
 import { setupDailyCron } from './cron/dailyHoroscope.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -32,6 +33,7 @@ app.post('/subscribe', subscribeRoute);
 app.post('/webhook/email', webhookRoute);
 app.use('/webhook', webhookRouter);
 app.use('/admin', adminRouter);
+app.use('/api/feedback', feedbackRouter);
 app.get('/unsubscribe/:token', unsubscribeRoute);
 app.post('/test/daily', testDailyRoute);
 app.get('/api/settings/:token', getSettingsRoute);
@@ -40,6 +42,11 @@ app.put('/api/settings/:token', updateSettingsRoute);
 // Settings page
 app.get('/settings/:token', (req, res) => {
   res.sendFile('settings.html', { root: landingDir });
+});
+
+// Feedback page
+app.get('/feedback/:token', (req, res) => {
+  res.sendFile('feedback.html', { root: landingDir });
 });
 
 // Admin dashboard

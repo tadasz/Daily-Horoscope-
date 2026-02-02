@@ -74,6 +74,16 @@ router.get('/stats', async (req, res) => {
       ORDER BY ee.created_at DESC LIMIT 20
     `);
     
+    // Feedback
+    const recentFeedback = await query(`
+      SELECT f.rating, f.message, f.created_at, u.name, u.email, u.language
+      FROM feedback f
+      JOIN users u ON u.id = f.user_id
+      ORDER BY f.created_at DESC LIMIT 20
+    `);
+    
+    const avgRating = await query(`SELECT AVG(rating)::numeric(3,1) as avg, COUNT(*) as count FROM feedback WHERE rating IS NOT NULL`);
+
     res.json({
       subscribers: subscribers.rows,
       unsubscribed: parseInt(unsubscribed.rows[0].count),
@@ -83,6 +93,8 @@ router.get('/stats', async (req, res) => {
       openRate: openRate.rows[0],
       recentUsers: recentUsers.rows,
       recentEvents: recentEvents.rows,
+      recentFeedback: recentFeedback.rows,
+      feedbackStats: avgRating.rows[0],
     });
   } catch (err) {
     console.error('Admin stats error:', err);
