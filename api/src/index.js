@@ -9,6 +9,8 @@ import { testDailyRoute } from './routes/test.js';
 import { getSettingsRoute, updateSettingsRoute } from './routes/settings.js';
 import adminRouter from './routes/admin.js';
 import feedbackRouter from './routes/feedback.js';
+import checkoutRouter from './routes/checkout.js';
+import creemWebhookRouter from './routes/creem-webhook.js';
 import { setupDailyCron } from './cron/dailyHoroscope.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -34,6 +36,8 @@ app.post('/webhook/email', webhookRoute);
 app.use('/webhook', webhookRouter);
 app.use('/admin', adminRouter);
 app.use('/api/feedback', feedbackRouter);
+app.use('/checkout', checkoutRouter);
+app.use('/webhook/creem', creemWebhookRouter);
 app.get('/unsubscribe/:token', unsubscribeRoute);
 app.post('/test/daily', testDailyRoute);
 app.get('/api/settings/:token', getSettingsRoute);
@@ -43,6 +47,11 @@ app.get('/api/welcome-status/:token', welcomeStatusRoute);
 // Welcome progress page
 app.get('/welcome/:token', (req, res) => {
   res.sendFile('welcome.html', { root: landingDir });
+});
+
+// Premium welcome page
+app.get('/premium/welcome', (req, res) => {
+  res.sendFile('premium-welcome.html', { root: landingDir });
 });
 
 // Settings page

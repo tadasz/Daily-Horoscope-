@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GATO Premium ✨</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      text-align: center;
+      max-width: 480px;
+      padding: 40px 24px;
+    }
+    .icon { font-size: 4em; margin-bottom: 24px; }
+    h1 { font-size: 1.6em; margin-bottom: 12px; color: #fbbf24; }
+    .subtitle { color: #999; font-size: 1.05em; line-height: 1.6; margin-bottom: 32px; }
+    .perks {
+      text-align: left;
+      max-width: 340px;
+      margin: 0 auto 32px;
+    }
+    .perk {
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 0.95em;
+      color: #c4b5fd;
+    }
+    .perk-icon { font-size: 1.1em; }
+    .cta {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 24px;
+      font-weight: 600;
+      font-size: 1em;
+      transition: transform 0.2s;
+    }
+    .cta:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">⭐</div>
+    <h1 id="title">Welcome to GATO Premium!</h1>
+    <p class="subtitle" id="subtitle">Your daily readings just got deeply personal.</p>
+    
+    <div class="perks">
+      <div class="perk">
+        <span class="perk-icon">🎯</span>
+        <span id="perk1">Your preferred reading style, every time</span>
+      </div>
+      <div class="perk">
+        <span class="perk-icon">💫</span>
+        <span id="perk2">Compatibility readings with anyone</span>
+      </div>
+      <div class="perk">
+        <span class="perk-icon">📖</span>
+        <span id="perk3">Monthly deep-dive cosmic report</span>
+      </div>
+      <div class="perk">
+        <span class="perk-icon">💬</span>
+        <span id="perk4">Reply to your readings — GATO remembers</span>
+      </div>
+    </div>
+
+    <a class="cta" href="/" id="cta">Back to GATO</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const lang = params.get('lang');
+    if (lang === 'lt') {
+      document.getElementById('title').textContent = 'Sveiki atvykę į GATO Premium!';
+      document.getElementById('subtitle').textContent = 'Tavo kasdieniniai skaitymai tapo dar asmeniškesni.';
+      document.getElementById('perk1').textContent = 'Tavo mėgstamas skaitymo stilius kiekvieną kartą';
+      document.getElementById('perk2').textContent = 'Suderinamumo skaitymai su bet kuo';
+      document.getElementById('perk3').textContent = 'Mėnesinis kosminis giluminis pranešimas';
+      document.getElementById('perk4').textContent = 'Atsakyk į skaitymus — GATO prisimena';
+      document.getElementById('cta').textContent = 'Grįžti į GATO';
+    }
+  </script>
+</body>
+</html>
