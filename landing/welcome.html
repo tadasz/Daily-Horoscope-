@@ -19,12 +19,17 @@
     .container {
       text-align: center;
       max-width: 480px;
+      width: 100%;
       padding: 40px 24px;
     }
+    .orb-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
     .orb {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 32px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       background: radial-gradient(circle at 40% 40%, #8b5cf6, #3b0764);
       box-shadow: 0 0 60px rgba(139, 92, 246, 0.4), 0 0 120px rgba(139, 92, 246, 0.15);
@@ -36,20 +41,13 @@
     }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      50% { transform: translateY(-8px); }
     }
     
-    h1 {
-      font-size: 1.5em;
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
+    h1 { font-size: 1.5em; margin-bottom: 12px; font-weight: 600; }
     .status-text {
-      color: #999;
-      font-size: 1.05em;
-      line-height: 1.6;
-      margin-bottom: 24px;
-      min-height: 3em;
+      color: #999; font-size: 1.05em; line-height: 1.6;
+      margin-bottom: 28px; min-height: 2em;
     }
     .steps {
       text-align: left;
@@ -60,29 +58,56 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 10px 0;
+      padding: 12px 0;
       font-size: 0.95em;
-      color: #666;
-      transition: color 0.5s, opacity 0.5s;
+      color: #444;
+      transition: color 0.5s;
+      position: relative;
     }
     .step.active { color: #c4b5fd; }
     .step.done { color: #6ee7b7; }
     .step-icon {
       width: 24px;
-      text-align: center;
-      font-size: 1.1em;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
+    .step-content { flex: 1; }
+    .step-label { font-weight: 500; }
+    
+    /* Progress bar per step */
+    .step-bar {
+      height: 3px;
+      background: rgba(139, 92, 246, 0.15);
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .step.active .step-bar { opacity: 1; }
+    .step-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8b5cf6, #c4b5fd);
+      border-radius: 2px;
+      transition: width 0.5s ease-out;
+    }
+    
     .spinner {
       display: inline-block;
-      width: 16px;
-      height: 16px;
+      width: 18px; height: 18px;
       border: 2px solid rgba(139, 92, 246, 0.3);
       border-top-color: #8b5cf6;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    
+    .circle { color: #333; font-size: 1.2em; }
+    .check { color: #6ee7b7; font-size: 1.1em; }
+
     /* Done state */
     .done-view { display: none; }
     .done-view h1 { color: #6ee7b7; }
@@ -96,42 +121,50 @@
     }
     .check-email p { color: #999; font-size: 0.9em; margin-top: 8px; }
     .spam-note {
-      color: #666;
-      font-size: 0.85em;
-      margin-top: 16px;
-      font-style: italic;
+      color: #666; font-size: 0.85em;
+      margin-top: 16px; font-style: italic;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Loading state -->
     <div id="loading-view">
-      <div class="orb"></div>
+      <div class="orb-wrap"><div class="orb"></div></div>
       <h1 id="title">Reading the stars...</h1>
       <p class="status-text" id="status-text">We're calculating your unique cosmic blueprint</p>
       
       <div class="steps">
-        <div class="step active" id="step1">
-          <span class="step-icon"><span class="spinner"></span></span>
-          <span id="step1-text">Mapping your natal chart</span>
+        <div class="step" id="step1">
+          <span class="step-icon"><span class="circle">○</span></span>
+          <div class="step-content">
+            <div class="step-label" id="step1-text">Mapping your natal chart</div>
+            <div class="step-bar"><div class="step-bar-fill" id="bar1"></div></div>
+          </div>
         </div>
         <div class="step" id="step2">
-          <span class="step-icon">○</span>
-          <span id="step2-text">Reading planetary aspects</span>
+          <span class="step-icon"><span class="circle">○</span></span>
+          <div class="step-content">
+            <div class="step-label" id="step2-text">Reading planetary aspects</div>
+            <div class="step-bar"><div class="step-bar-fill" id="bar2"></div></div>
+          </div>
         </div>
         <div class="step" id="step3">
-          <span class="step-icon">○</span>
-          <span id="step3-text">Writing your personal reading</span>
+          <span class="step-icon"><span class="circle">○</span></span>
+          <div class="step-content">
+            <div class="step-label" id="step3-text">Writing your personal reading</div>
+            <div class="step-bar"><div class="step-bar-fill" id="bar3"></div></div>
+          </div>
         </div>
         <div class="step" id="step4">
-          <span class="step-icon">○</span>
-          <span id="step4-text">Sending to your inbox</span>
+          <span class="step-icon"><span class="circle">○</span></span>
+          <div class="step-content">
+            <div class="step-label" id="step4-text">Sending to your inbox</div>
+            <div class="step-bar"><div class="step-bar-fill" id="bar4"></div></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Done state -->
     <div class="done-view" id="done-view">
       <div class="done-emoji">✨</div>
       <h1 id="done-title">Your cosmic blueprint is ready!</h1>
@@ -148,7 +181,6 @@
     const lang = params.get('lang') || 'en';
     const token = window.location.pathname.split('/').pop().split('?')[0];
 
-    // Lithuanian translations
     const lt = {
       title: 'Skaitome žvaigždes...',
       statusText: 'Skaitome tavo unikalų kosminį portretą',
@@ -176,44 +208,66 @@
       document.getElementById('spam-note').textContent = lt.spamNote;
     }
 
-    // Animate steps progressively while waiting
-    let currentStep = 1;
-    const stepTimers = [
-      setTimeout(() => advanceStep(2), 2000),
-      setTimeout(() => advanceStep(3), 5000),
-      setTimeout(() => advanceStep(4), 9000),
-    ];
+    let finished = false;
 
-    function advanceStep(n) {
-      if (currentStep >= 5) return; // already done
-      for (let i = 1; i < n; i++) {
-        const el = document.getElementById(`step${i}`);
-        el.classList.remove('active');
-        el.classList.add('done');
-        el.querySelector('.step-icon').textContent = '✓';
-      }
-      const active = document.getElementById(`step${n}`);
-      if (active) {
-        active.classList.add('active');
-        active.querySelector('.step-icon').innerHTML = '<span class="spinner"></span>';
-      }
+    // Step durations in ms — total ~30s for Opus welcome generation
+    const stepDurations = [5000, 8000, 12000, 7000]; // 5s, 8s, 12s, 7s
+    let currentStep = 0;
+
+    function startStep(n) {
+      if (finished) return;
       currentStep = n;
+      const step = document.getElementById(`step${n}`);
+      const bar = document.getElementById(`bar${n}`);
+      if (!step) return;
+      
+      step.classList.add('active');
+      step.querySelector('.step-icon').innerHTML = '<span class="spinner"></span>';
+      
+      // Animate progress bar
+      const duration = stepDurations[n - 1];
+      let progress = 0;
+      const interval = setInterval(() => {
+        if (finished || currentStep !== n) { clearInterval(interval); return; }
+        progress += 100 / (duration / 200);
+        if (progress > 95) progress = 95; // never quite finish until done
+        bar.style.width = progress + '%';
+      }, 200);
+    }
+
+    function completeStep(n) {
+      const step = document.getElementById(`step${n}`);
+      const bar = document.getElementById(`bar${n}`);
+      if (!step) return;
+      step.classList.remove('active');
+      step.classList.add('done');
+      step.querySelector('.step-icon').innerHTML = '<span class="check">✓</span>';
+      bar.style.width = '100%';
+    }
+
+    // Start step 1 immediately
+    startStep(1);
+
+    // Schedule step transitions
+    let elapsed = 0;
+    for (let i = 0; i < stepDurations.length - 1; i++) {
+      elapsed += stepDurations[i];
+      const nextStep = i + 2;
+      setTimeout(() => {
+        if (finished) return;
+        completeStep(nextStep - 1);
+        startStep(nextStep);
+      }, elapsed);
     }
 
     function showDone() {
-      currentStep = 5;
-      // Mark all steps done
-      for (let i = 1; i <= 4; i++) {
-        const el = document.getElementById(`step${i}`);
-        el.classList.remove('active');
-        el.classList.add('done');
-        el.querySelector('.step-icon').textContent = '✓';
-      }
-      // Short delay then show done view
+      finished = true;
+      // Complete all steps
+      for (let i = 1; i <= 4; i++) completeStep(i);
       setTimeout(() => {
         document.getElementById('loading-view').style.display = 'none';
         document.getElementById('done-view').style.display = 'block';
-      }, 800);
+      }, 600);
     }
 
     // Poll for status
@@ -223,16 +277,12 @@
       try {
         const res = await fetch(`/api/welcome-status/${token}`);
         const data = await res.json();
-        if (data.status === 'sent') {
+        if (data.status === 'sent' || data.status === 'error') {
           clearInterval(pollInterval);
           showDone();
-        } else if (data.status === 'error') {
-          clearInterval(pollInterval);
-          showDone(); // Show done anyway — they'll still get daily emails
         }
       } catch (e) {}
-      // After 60s, just show done regardless
-      if (pollCount > 30) {
+      if (pollCount > 45) { // 90s timeout
         clearInterval(pollInterval);
         showDone();
       }
