@@ -62,6 +62,19 @@ Respond in this exact JSON format:
   "horoscope": "the deeply personalized horoscope text (under 120 words)"
 }`;
 
+const GRAMMAR_REVIEW_LT = `Esi profesionalus lietuvių kalbos redaktorius, lietuvių kalbos ekspertas. Tavo užduotis — patikrinti ir pataisyti lietuvišką tekstą.
+
+Taisyk:
+- Gramatikos klaidas (linksniai, galūnės, prielinksniai)
+- Nenatūralias frazes (pakeisk natūralesnėmis lietuviškomis)
+- Vertimo kalbą (kai sakinys skamba kaip versta iš anglų kalbos)
+- Skyrybos klaidas
+
+NEKIESK turinio, stiliaus ar tono. Taisyk tik klaidas.
+Jei tekstas geras — grąžink nepakeistą.
+
+Atsakyk JSON: {"subject": "pataisyta antraštė", "preheader": "pataisytas preheader", "horoscope": "pataisytas tekstas"}`;
+
 const SYSTEM_FOLLOWUP = `You are their personal astrologer. They just replied to today's horoscope.
 Be warm, insightful, and connect their response to their astrological chart.
 Rules:
@@ -142,8 +155,8 @@ ${generateLabel}`;
     systemPrompt = SYSTEM_FREE;
   }
 
-  // Sonnet for Lithuanian (better quality), Haiku for English (fast + cheap)
-  const model = isLithuanian ? 'claude-sonnet-4-20250514' : 'claude-3-haiku-20240307';
+  // Opus 4.5 for Lithuanian (best quality), Haiku for English (fast + cheap)
+  const model = isLithuanian ? 'claude-opus-4-5-20251101' : 'claude-3-haiku-20240307';
 
   const response = await anthropic.messages.create({
     model,
@@ -154,7 +167,30 @@ ${generateLabel}`;
 
   let text = response.content[0].text;
   text = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
-  return JSON.parse(text);
+  let result = JSON.parse(text);
+
+  // Lithuanian grammar review pass with Sonnet 4.5
+  if (isLithuanian) {
+    try {
+      const reviewInput = `Antraštė: ${result.subject}\nPreheader: ${result.preheader}\nTekstas: ${result.horoscope}`;
+      const reviewResp = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 500,
+        system: GRAMMAR_REVIEW_LT,
+        messages: [{ role: 'user', content: reviewInput }],
+      });
+      let reviewText = reviewResp.content[0].text;
+      reviewText = reviewText.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+      const reviewed = JSON.parse(reviewText);
+      if (reviewed.horoscope) result.horoscope = reviewed.horoscope;
+      if (reviewed.subject) result.subject = reviewed.subject;
+      if (reviewed.preheader) result.preheader = reviewed.preheader;
+    } catch (e) {
+      console.warn('⚠️ Lithuanian grammar review failed, using original:', e.message);
+    }
+  }
+
+  return result;
 }
 
 

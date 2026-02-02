@@ -21,11 +21,13 @@ export function setupDailyCron() {
 }
 
 
-export async function runDailyHoroscopes() {
+export async function runDailyHoroscopes(testEmail = null) {
   const startTime = Date.now();
   
-  // Get all subscribed users with language
-  const users = await query('SELECT * FROM users WHERE subscribed = TRUE');
+  // Get subscribed users (filter to single email in test mode)
+  const users = testEmail 
+    ? await query('SELECT * FROM users WHERE subscribed = TRUE AND email = $1', [testEmail])
+    : await query('SELECT * FROM users WHERE subscribed = TRUE');
   console.log(`Found ${users.rows.length} subscribed users`);
 
   // Get current sky (same for everyone)
