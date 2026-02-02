@@ -218,6 +218,22 @@ export async function generateWelcomeReading(user, natalChart, currentSky) {
   });
 
   let text = response.content[0].text;
+
+  // Lithuanian grammar review pass with Sonnet 4.5
+  if (user.language === 'lt') {
+    try {
+      const reviewResp = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 3000,
+        system: `Esi lietuvių kalbos redaktorius. Patikrink ir ištaisyk gramatikos, linksnių, šauksmininko, prielinksnių klaidas. Grąžink VISĄ tekstą su pataisymais. Nekeisk stiliaus, turinio ar struktūros — tik kalbos klaidas. Grąžink TIK pataisytą tekstą, be komentarų.`,
+        messages: [{ role: 'user', content: text }],
+      });
+      text = reviewResp.content[0].text;
+      console.log('✅ Lithuanian welcome grammar review passed');
+    } catch (e) {
+      console.error('⚠️ Lithuanian grammar review failed (using original):', e.message);
+    }
+  }
   
   // Extract JSON - handle markdown code blocks and control characters
   const jsonMatch = text.match(/\{[\s\S]*\}/);
