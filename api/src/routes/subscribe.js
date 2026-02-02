@@ -11,7 +11,7 @@ const welcomeStatus = new Map();
 export async function subscribeRoute(req, res) {
   try {
     const { name, email, birth_date, birth_time, birth_city, birth_lat, birth_lng, timezone, focus_area, context, language,
-            quiz_style, quiz_length, quiz_relationship, quiz_read_time } = req.body;
+            gender, quiz_style, quiz_length, quiz_relationship, quiz_read_time } = req.body;
 
     if (!email || !birth_date || !name) {
       return res.status(400).json({ error: 'Name, email, and birth date are required.' });
@@ -79,12 +79,13 @@ export async function subscribeRoute(req, res) {
     const token = user.unsub_token;
 
     // Save quiz preferences if provided
-    if (quiz_style || quiz_length || quiz_relationship || quiz_read_time) {
+    if (quiz_style || quiz_length || quiz_relationship || quiz_read_time || gender) {
       await query(
         `UPDATE users SET quiz_style = COALESCE($2, quiz_style), quiz_length = COALESCE($3, quiz_length),
-         quiz_relationship = COALESCE($4, quiz_relationship), quiz_read_time = COALESCE($5, quiz_read_time)
+         quiz_relationship = COALESCE($4, quiz_relationship), quiz_read_time = COALESCE($5, quiz_read_time),
+         gender = COALESCE($6, gender)
          WHERE id = $1`,
-        [user.id, quiz_style || null, quiz_length || null, quiz_relationship || null, quiz_read_time || null]
+        [user.id, quiz_style || null, quiz_length || null, quiz_relationship || null, quiz_read_time || null, gender || null]
       );
     }
 

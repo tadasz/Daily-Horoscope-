@@ -271,7 +271,7 @@
   <div class="quiz-wrap">
     <!-- Slide 1: Style -->
     <div class="slide active" data-slide="1">
-      <div class="slide-number" data-i18n="step">Step 1 of 7</div>
+      <div class="slide-number" data-i18n="step">Step 1 of 9</div>
       <h2 data-i18n="s1_title">How should your readings feel?</h2>
       <p class="slide-desc" data-i18n="s1_desc">Pick the voice that resonates with you.</p>
       <div class="options" data-field="style">
@@ -308,7 +308,7 @@
 
     <!-- Slide 2: Length -->
     <div class="slide" data-slide="2">
-      <div class="slide-number" data-i18n="step2">Step 2 of 7</div>
+      <div class="slide-number" data-i18n="step2">Step 2 of 9</div>
       <h2 data-i18n="s2_title">How deep should we go?</h2>
       <p class="slide-desc" data-i18n="s2_desc">Pick your ideal reading length.</p>
       <div class="options" data-field="length">
@@ -338,7 +338,7 @@
 
     <!-- Slide 3: Life focus (multi-select) -->
     <div class="slide" data-slide="3">
-      <div class="slide-number" data-i18n="step3">Step 3 of 7</div>
+      <div class="slide-number" data-i18n="step3">Step 3 of 9</div>
       <h2 data-i18n="s3_title">What's happening in your life?</h2>
       <p class="slide-desc" data-i18n="s3_desc">Select all that apply. This shapes what we focus on.</p>
       <div class="multi-wrap" data-field="focus" data-multi="true">
@@ -357,7 +357,7 @@
 
     <!-- Slide 4: Relationship -->
     <div class="slide" data-slide="4">
-      <div class="slide-number" data-i18n="step4">Step 4 of 7</div>
+      <div class="slide-number" data-i18n="step4">Step 4 of 9</div>
       <h2 data-i18n="s4_title">Relationship status?</h2>
       <p class="slide-desc" data-i18n="s4_desc">Helps us frame Venus and Mars transits for you.</p>
       <div class="options" data-field="relationship">
@@ -382,7 +382,7 @@
 
     <!-- Slide 5: Time preference -->
     <div class="slide" data-slide="5">
-      <div class="slide-number" data-i18n="step5">Step 5 of 7</div>
+      <div class="slide-number" data-i18n="step5">Step 5 of 9</div>
       <h2 data-i18n="s5_title">When do you read your horoscope?</h2>
       <p class="slide-desc" data-i18n="s5_desc">We'll time the delivery just right.</p>
       <div class="options" data-field="read_time">
@@ -401,46 +401,80 @@
       </div>
     </div>
 
-    <!-- Slide 6: Signup info -->
+    <!-- Slide 6: Birth info -->
     <div class="slide" data-slide="6">
-      <div class="slide-number" data-i18n="step6">Step 6 of 7</div>
-      <h2 data-i18n="s6_title">Almost there — tell us about you</h2>
-      <p class="slide-desc" data-i18n="s6_desc">We need your birth info to calculate your real natal chart.</p>
+      <div class="slide-number" data-i18n="step6">Step 6 of 9</div>
+      <h2 data-i18n="s6_title">When and where were you born?</h2>
+      <p class="slide-desc" data-i18n="s6_desc">We need this to calculate your real natal chart — not a generic horoscope.</p>
       
-      <div class="form-row">
-        <div class="form-group">
-          <label data-i18n="s6_name">Your name</label>
-          <input type="text" id="q-name" placeholder="First name" required>
-        </div>
-        <div class="form-group">
-          <label data-i18n="s6_email">Email</label>
-          <input type="email" id="q-email" placeholder="you@email.com" required>
-        </div>
-      </div>
       <div class="form-row">
         <div class="form-group">
           <label data-i18n="s6_birthday">Birthday</label>
           <input type="date" id="q-birthday" required>
         </div>
         <div class="form-group">
-          <label data-i18n="s6_city">Birth city</label>
-          <input type="text" id="q-city" placeholder="Vilnius" required>
+          <label data-i18n="s6_time">Birth time <span style="color:#555">(optional)</span></label>
+          <input type="time" id="q-time">
         </div>
       </div>
       <div class="form-group">
-        <label data-i18n="s6_time">Birth time <span style="color:#555">(optional, for full chart)</span></label>
-        <input type="time" id="q-time">
+        <label data-i18n="s6_city">Birth city</label>
+        <input type="text" id="q-city" placeholder="Vilnius" required>
+      </div>
+
+      <button class="btn-next" onclick="validateBirth() && nextSlide()" data-i18n-btn="next">Continue →</button>
+      <br><button class="btn-back" onclick="prevSlide()" data-i18n-btn="back">← Back</button>
+    </div>
+
+    <!-- Slide 7: Gender -->
+    <div class="slide" data-slide="7">
+      <div class="slide-number" data-i18n="step7">Step 7 of 9</div>
+      <h2 data-i18n="s7g_title">How do you identify?</h2>
+      <p class="slide-desc" data-i18n="s7g_desc">Helps us personalize the language in your readings.</p>
+      <div class="options" data-field="gender">
+        <div class="option" data-value="female">
+          <span class="option-icon">♀️</span>
+          <div class="option-text"><div class="option-label" data-i18n="s7g_female">Female</div></div>
+        </div>
+        <div class="option" data-value="male">
+          <span class="option-icon">♂️</span>
+          <div class="option-text"><div class="option-label" data-i18n="s7g_male">Male</div></div>
+        </div>
+        <div class="option" data-value="nonbinary">
+          <span class="option-icon">⚧️</span>
+          <div class="option-text"><div class="option-label" data-i18n="s7g_nonbinary">Non-binary</div></div>
+        </div>
+        <div class="option" data-value="skip">
+          <span class="option-icon">🌟</span>
+          <div class="option-text"><div class="option-label" data-i18n="s7g_skip">Prefer not to say</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: Signup (name + email) -->
+    <div class="slide" data-slide="8">
+      <div class="slide-number" data-i18n="step8">Step 8 of 9</div>
+      <h2 data-i18n="s8_title">Where should we send your reading?</h2>
+      <p class="slide-desc" data-i18n="s8_desc">Your first personalized cosmic reading is waiting.</p>
+      
+      <div class="form-group">
+        <label data-i18n="s8_name">Your name</label>
+        <input type="text" id="q-name" placeholder="First name" required>
+      </div>
+      <div class="form-group">
+        <label data-i18n="s8_email">Email</label>
+        <input type="email" id="q-email" placeholder="you@email.com" required>
       </div>
 
       <button class="btn-next" id="signup-btn" onclick="submitQuiz()" data-i18n-btn="see_plan">See my cosmic plan ✨</button>
       <br><button class="btn-back" onclick="prevSlide()" data-i18n-btn="back">← Back</button>
     </div>
 
-    <!-- Slide 7: Paywall -->
-    <div class="slide" data-slide="7">
-      <div class="slide-number" data-i18n="step7">Step 7 of 7</div>
-      <h2 data-i18n="s7_title">Your cosmic profile is ready!</h2>
-      <p class="slide-desc" data-i18n="s7_desc">Choose how you want to experience GATO.</p>
+    <!-- Slide 9: Paywall -->
+    <div class="slide" data-slide="9">
+      <div class="slide-number" data-i18n="step9">Step 9 of 9</div>
+      <h2 data-i18n="s9_title">Your cosmic profile is ready!</h2>
+      <p class="slide-desc" data-i18n="s9_desc">Choose how you want to experience GATO.</p>
 
       <div class="plan-cards">
         <div class="plan-card plan-free" onclick="choosePlan('free')">
@@ -476,15 +510,16 @@
   <script>
     // State
     let current = 1;
-    const total = 7;
+    const total = 9;
     const answers = {};
     let lang = 'en';
     let signupToken = null;
 
     // i18n
     const lt = {
-      step: 'Žingsnis 1 iš 7', step2: 'Žingsnis 2 iš 7', step3: 'Žingsnis 3 iš 7',
-      step4: 'Žingsnis 4 iš 7', step5: 'Žingsnis 5 iš 7', step6: 'Žingsnis 6 iš 7', step7: 'Žingsnis 7 iš 7',
+      step: 'Žingsnis 1 iš 9', step2: 'Žingsnis 2 iš 9', step3: 'Žingsnis 3 iš 9',
+      step4: 'Žingsnis 4 iš 9', step5: 'Žingsnis 5 iš 9', step6: 'Žingsnis 6 iš 9',
+      step7: 'Žingsnis 7 iš 9', step8: 'Žingsnis 8 iš 9', step9: 'Žingsnis 9 iš 9',
       s1_title: 'Kaip turėtų skambėti tavo skaitymai?',
       s1_desc: 'Pasirink balsą, kuris tau artimas.',
       s1_mystic: 'Mistinis ir poetiškas',
@@ -511,12 +546,18 @@
       s5_title: 'Kada skaitai savo horoskopą?',
       s5_desc: 'Parinkime tinkamą laiką.',
       s5_morning: 'Ryte — su kava', s5_evening: 'Vakare — prieš miegą', s5_whenever: 'Kada pasitaiko',
-      s6_title: 'Beveik baigta — papasakok apie save',
+      s6_title: 'Kada ir kur gimei?',
       s6_desc: 'Mums reikia tavo gimimo duomenų tikram gimimo žemėlapiui apskaičiuoti.',
-      s6_name: 'Tavo vardas', s6_email: 'El. paštas', s6_birthday: 'Gimtadienis', s6_city: 'Gimimo miestas',
-      s6_time: 'Gimimo laikas <span style="color:#555">(neprivaloma, pilnam žemėlapiui)</span>',
-      s7_title: 'Tavo kosminis profilis paruoštas!',
-      s7_desc: 'Pasirink, kaip nori patirti GATO.',
+      s6_birthday: 'Gimtadienis', s6_city: 'Gimimo miestas',
+      s6_time: 'Gimimo laikas <span style="color:#555">(neprivaloma)</span>',
+      s7g_title: 'Kaip save identifikuoji?',
+      s7g_desc: 'Padeda personalizuoti kalbą tavo skaitymuose.',
+      s7g_female: 'Moteris', s7g_male: 'Vyras', s7g_nonbinary: 'Nebinarinis', s7g_skip: 'Nenoriu atsakyti',
+      s8_title: 'Kur siųsti tavo skaitymą?',
+      s8_desc: 'Tavo pirmasis asmeninis kosminis skaitymas jau laukia.',
+      s8_name: 'Tavo vardas', s8_email: 'El. paštas',
+      s9_title: 'Tavo kosminis profilis paruoštas!',
+      s9_desc: 'Pasirink, kaip nori patirti GATO.',
       s7_free_price: 'Nemokama', s7_free_sub: 'visam laikui', s7_prem_sub: '/mėn.',
       s7_badge: 'POPULIARU',
       s7_f1: 'Kasdieninis skaitymas', s7_f2: 'Gimimo žemėlapis', s7_f3: 'Numerologija',
@@ -602,6 +643,17 @@
       });
     });
 
+    // Validate birth info (slide 6)
+    function validateBirth() {
+      const birthday = document.getElementById('q-birthday').value;
+      const city = document.getElementById('q-city').value.trim();
+      if (!birthday || !city) {
+        alert(lang === 'lt' ? 'Prašome įvesti gimtadienį ir miestą.' : 'Please enter your birthday and birth city.');
+        return false;
+      }
+      return true;
+    }
+
     // Submit quiz (signup)
     async function submitQuiz() {
       const name = document.getElementById('q-name').value.trim();
@@ -610,8 +662,8 @@
       const city = document.getElementById('q-city').value.trim();
       const time = document.getElementById('q-time').value;
 
-      if (!name || !email || !birthday || !city) {
-        alert(lang === 'lt' ? 'Prašome užpildyti visus privalomus laukus.' : 'Please fill in all required fields.');
+      if (!name || !email) {
+        alert(lang === 'lt' ? 'Prašome įvesti vardą ir el. paštą.' : 'Please enter your name and email.');
         return;
       }
 
@@ -631,7 +683,7 @@
             birth_time: time || undefined,
             language: lang,
             focus_area: (answers.focus || []).join(','),
-            // Quiz preferences
+            gender: answers.gender,
             quiz_style: answers.style,
             quiz_length: answers.length,
             quiz_relationship: answers.relationship,
@@ -641,7 +693,7 @@
         const data = await res.json();
         if (data.token) {
           signupToken = data.token;
-          showSlide(7);
+          showSlide(9);
         } else if (data.error) {
           alert(data.error);
           btn.disabled = false;
