@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GATO — Settings</title>
+  <meta name="description" content="Update your horoscope preferences">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .loading { display: none; text-align: center; color: #6a5f80; }
+    .error { display: none; color: #c0392b; background: rgba(192, 57, 43, 0.1); padding: 12px; border-radius: 6px; margin-bottom: 20px; }
+    .success { display: none; color: #27ae60; background: rgba(39, 174, 96, 0.1); padding: 12px; border-radius: 6px; margin-bottom: 20px; }
+    .save-btn { 
+      background: linear-gradient(135deg, #6b4c9a 0%, #4a3570 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .save-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 24px rgba(107, 76, 154, 0.5); }
+    .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .current-value { color: #6a5f80; font-size: 13px; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header style="text-align: center; margin-bottom: 40px;">
+      <div class="logo">
+        <span class="logo-icon">🐱</span>
+        <span class="logo-text">GATO</span>
+      </div>
+      <h1>Settings</h1>
+      <p class="desc">Update your horoscope preferences</p>
+    </header>
+
+    <div class="loading">Loading your settings...</div>
+    <div class="error" id="error"></div>
+    <div class="success" id="success">Settings saved successfully!</div>
+
+    <form id="settingsForm" class="signup-form" style="display: none;">
+      <div class="field">
+        <label for="language">Language</label>
+        <select id="language" name="language">
+          <option value="en">English</option>
+          <option value="lt">Lietuvių</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Focus area — what matters most to you right now?</label>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="focus_area" value="love"> Love & Relationships</label>
+          <label class="radio"><input type="radio" name="focus_area" value="career"> Career & Purpose</label>
+          <label class="radio"><input type="radio" name="focus_area" value="health"> Health & Energy</label>
+          <label class="radio"><input type="radio" name="focus_area" value="growth"> Personal Growth</label>
+          <label class="radio"><input type="radio" name="focus_area" value="money"> Money & Abundance</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="birth_time">
+          Birth time (if you want to add or update it)
+          <span class="optional">(optional)</span>
+        </label>
+        <div class="current-value" id="currentBirthTime"></div>
+        <input type="time" id="birth_time" name="birth_time">
+      </div>
+
+      <div class="field">
+        <label for="birth_city">
+          Birth city (if you want to add or update it)
+          <span class="tip-wrap">
+            <span class="tip-icon">?</span>
+            <span class="tip-text">Changing your birth city will recalculate your natal chart with new coordinates.</span>
+          </span>
+        </label>
+        <div class="current-value" id="currentBirthCity"></div>
+        <input type="text" id="birth_city" name="birth_city" placeholder="e.g., Barcelona, Spain">
+      </div>
+
+      <button type="submit" class="save-btn">Save Settings</button>
+    </form>
+
+    <footer style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #1a1a2e; text-align: center;">
+      <p style="font-size: 13px; color: #4a4060; line-height: 1.8;">
+        🐱 GATO — Personal Astrology, Tailored for One
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Get token from URL path
+    const pathParts = window.location.pathname.split('/');
+    const token = pathParts[pathParts.length - 1];
+
+    if (!token || token === 'settings.html') {
+      showError('Invalid or missing token in URL');
+    } else {
+      loadSettings();
+    }
+
+    async function loadSettings() {
+      try {
+        document.querySelector('.loading').style.display = 'block';
+        
+        const response = await fetch(`/api/settings/${token}`);
+        const data = await response.json();
+        
+        document.querySelector('.loading').style.display = 'none';
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load settings');
+        }
+        
+        // Populate form
+        document.getElementById('language').value = data.language || 'en';
+        
+        if (data.focus_area) {
+          const focusRadio = document.querySelector(`input[name="focus_area"][value="${data.focus_area}"]`);
+          if (focusRadio) focusRadio.checked = true;
+        }
+        
+        if (data.birth_time) {
+          document.getElementById('currentBirthTime').textContent = `Current: ${data.birth_time}`;
+          document.getElementById('birth_time').value = data.birth_time;
+        } else {
+          document.getElementById('currentBirthTime').textContent = 'No birth time set';
+        }
+        
+        if (data.birth_city) {
+          document.getElementById('currentBirthCity').textContent = `Current: ${data.birth_city}`;
+        } else {
+          document.getElementById('currentBirthCity').textContent = 'No birth city set';
+        }
+        
+        document.getElementById('settingsForm').style.display = 'block';
+        
+      } catch (error) {
+        document.querySelector('.loading').style.display = 'none';
+        showError(error.message);
+      }
+    }
+
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = e.target.querySelector('.save-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+      
+      try {
+        const formData = new FormData(e.target);
+        const data = {
+          language: formData.get('language'),
+          focus_area: formData.get('focus_area'),
+          birth_time: formData.get('birth_time') || null,
+          birth_city: formData.get('birth_city') || null,
+        };
+        
+        const response = await fetch(`/api/settings/${token}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to save settings');
+        }
+        
+        showSuccess();
+        
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Settings';
+      }
+    });
+
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      document.getElementById('success').style.display = 'none';
+    }
+
+    function showSuccess() {
+      document.getElementById('success').style.display = 'block';
+      document.getElementById('error').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

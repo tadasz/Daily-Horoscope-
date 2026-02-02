@@ -25,6 +25,26 @@ Respond in this exact JSON format:
   "horoscope": "the horoscope text (under 80 words)"
 }`;
 
+const SYSTEM_FREE_LT = `Tu esi Palmira Kelertienė — autoritetingas, tiesmukas astrologas, rašantis asmeninį kasdienės horoskopą.
+Tavo stilius: aiškus, praktiškas, be minkštimų. Įspėji apie konkrečius pavojus, duodi konkretų patarimą.
+Taisyklės:
+- Horoskopas iki 80 žodžių
+- Naudok tikras planetų pozicijas iš duomenų
+- Niekada netapk doomingu — net sunkūs tranzitai turi augimo galimybių
+- Naudok "tu", "tavo" — tai asmeniškai
+- Struktūra: "jei nesugebėsite... tai gali...", konkretūs veiksmai
+- NENAUDOK zodiako ženklų kaip etiketės ("Brangus Skorpione...") — tiesiog kalbėk
+- Teminis ir antraštės negali kartoti ankstesnių laiškų (pateikta žemiau)
+- Antraštė turi užsiminti apie šiandienos energiją
+- Naudok lietuviškus zodiako pavadinimus: Avinas, Jautis, Dvyniai, Vėžys, Liūtas, Mergelė, Svarstyklės, Skorpionas, Šaulys, Ožiaragis, Vandenis, Žuvys
+
+Atsakyk šiuo JSON formatu:
+{
+  "subject": "trumpa antraštė — asmeninė, intriguojanti, užsiminanti apie šiandien. Naudok ☽ arba ✨. NEĮTRAUKTI datos.",
+  "preheader": "vieno sakinio peržiūra — suteikianti skaitymo nuotaiką",
+  "horoscope": "horoskopo tekstas (iki 80 žodžių)"
+}`;
+
 const SYSTEM_PREMIUM = `You are a warm, knowledgeable astrologer who KNOWS this person. You've been talking with them.
 Sound like a wise friend who sees their whole life through the lens of the stars.
 Rules:
@@ -59,44 +79,73 @@ Respond in this exact JSON format:
 
 export async function generateDailyHoroscope(user, transitData, previousEmails = []) {
   const isPremium = user.subscription === 'premium';
+  const isLithuanian = user.language === 'lt';
   
-  let userContext = `Name: ${user.name}\nSun sign: ${user.sun_sign}`;
+  let userContext = isLithuanian 
+    ? `Vardas: ${user.name}\nSaulės ženklas: ${user.sun_sign}`
+    : `Name: ${user.name}\nSun sign: ${user.sun_sign}`;
   
   if (isPremium) {
-    if (user.moon_sign) userContext += `\nMoon sign: ${user.moon_sign}`;
-    if (user.rising_sign) userContext += `\nRising sign: ${user.rising_sign}`;
+    if (user.moon_sign) userContext += isLithuanian 
+      ? `\nMėnulio ženklas: ${user.moon_sign}`
+      : `\nMoon sign: ${user.moon_sign}`;
+    if (user.rising_sign) userContext += isLithuanian 
+      ? `\nKylantis ženklas: ${user.rising_sign}`
+      : `\nRising sign: ${user.rising_sign}`;
   }
   
-  userContext += `\nFocus area: ${user.focus_area || 'general'}`;
+  userContext += isLithuanian 
+    ? `\nFokuso sritis: ${user.focus_area || 'bendras'}`
+    : `\nFocus area: ${user.focus_area || 'general'}`;
   
   if (isPremium && user.profile_notes) {
-    userContext += `\n\nWhat I know about them:\n${user.profile_notes}`;
+    userContext += isLithuanian 
+      ? `\n\nKą apie juos žinau:\n${user.profile_notes}`
+      : `\n\nWhat I know about them:\n${user.profile_notes}`;
   }
   
   if (isPremium && user.initial_context) {
-    userContext += `\n\nThey initially said: "${user.initial_context}"`;
+    userContext += isLithuanian 
+      ? `\n\nJie iš pradžių sakė: "${user.initial_context}"`
+      : `\n\nThey initially said: "${user.initial_context}"`;
   }
 
   // Include previous emails to avoid repetition
   let prevContext = '';
   if (previousEmails.length > 0) {
-    prevContext = '\n\nPrevious email subjects (do NOT repeat these themes):\n';
+    prevContext = isLithuanian 
+      ? '\n\nAnkstesnių laiškų antraštės (NEKARTOKITE šių temų):\n'
+      : '\n\nPrevious email subjects (do NOT repeat these themes):\n';
     for (const e of previousEmails) {
       prevContext += `- "${e.subject}"\n`;
     }
   }
 
+  const todaysSkyLabel = isLithuanian ? "Šiandienos dangus:" : "Today's sky:";
+  const generateLabel = isLithuanian 
+    ? "Sugeneruok jų kasdienės horoskopą šiai dienai."
+    : "Generate their daily horoscope for today.";
+
   const prompt = `${userContext}
 
-Today's sky:
+${todaysSkyLabel}
 ${transitData.summary || 'Moon in ' + transitData.moon_sign + ' (' + transitData.moon_phase + ')'}
 ${prevContext}
-Generate their daily horoscope for today.`;
+${generateLabel}`;
+
+  let systemPrompt;
+  if (isPremium) {
+    systemPrompt = SYSTEM_PREMIUM; // Premium stays in English for now
+  } else if (isLithuanian) {
+    systemPrompt = SYSTEM_FREE_LT;
+  } else {
+    systemPrompt = SYSTEM_FREE;
+  }
 
   const response = await anthropic.messages.create({
     model: 'claude-3-haiku-20240307',
     max_tokens: 500,
-    system: isPremium ? SYSTEM_PREMIUM : SYSTEM_FREE,
+    system: systemPrompt,
     messages: [{ role: 'user', content: prompt }],
   });
 

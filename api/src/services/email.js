@@ -36,6 +36,17 @@ async function sweegoSend(body) {
 
 export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }, transitSummary = '', numerology = null) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
+  const settingsUrl = `${config.appUrl}/settings/${user.unsub_token}`;
+  const isLithuanian = user.language === 'lt';
+
+  const todaysNumbers = isLithuanian ? 'Dienos skaičiai' : 'Today\'s Numbers';
+  const personalDay = isLithuanian ? 'Tavo dienos skaičius' : 'Your personal day';
+  const universalEnergy = isLithuanian ? 'Visuotinė energija' : 'Universal energy';
+  const questionsText = isLithuanian 
+    ? 'Turite klausimų? Tiesiog atsakykite į šį laišką.'
+    : 'Questions? Want to dive deeper? Just reply to this email.';
+  const unsubText = isLithuanian ? 'Atsisakyti prenumeratos' : 'Unsubscribe';
+  const settingsText = isLithuanian ? 'Nustatymai' : 'Settings';
 
   const techBlock = transitSummary ? `
       <div style="background: #f8f6fc; border-radius: 8px; padding: 16px 20px; margin: 24px 0; border-left: 3px solid #6b4c9a;">
@@ -53,22 +64,29 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
       </p>
       ${numerology ? `
       <div style="background: #f8f6fc; border-radius: 8px; padding: 14px 18px; margin: 24px 0;">
-        <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b4c9a; margin: 0 0 6px; font-weight: 600;">Today's Numbers</p>
+        <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b4c9a; margin: 0 0 6px; font-weight: 600;">${todaysNumbers}</p>
         <span style="font-size: 14px; color: #444; line-height: 1.6;">
-          🔢 Your personal day: <strong>${numerology.personalDay}</strong> <span style="color: #888; font-size: 12px;">— ${numerology.personalDayMeaning || ''}</span><br>
-          🌐 Universal energy: <strong>${numerology.universalDay}</strong> <span style="color: #888; font-size: 12px;">— ${numerology.universalDayMeaning || ''}</span>
+          🔢 ${personalDay}: <strong>${numerology.personalDay}</strong> <span style="color: #888; font-size: 12px;">— ${numerology.personalDayMeaning || ''}</span><br>
+          🌐 ${universalEnergy}: <strong>${numerology.universalDay}</strong> <span style="color: #888; font-size: 12px;">— ${numerology.universalDayMeaning || ''}</span>
         </span>
       </div>` : ''}
       <p style="font-size: 15px; color: #888; margin-top: 24px;">
-        <em>Questions? Want to dive deeper? Just reply to this email.</em>
+        <em>${questionsText}</em>
       </p>
       ${techBlock}
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
       <p style="font-size: 12px; color: #aaa; text-align: center;">
-        <a href="${unsubUrl}" style="color: #aaa;">Unsubscribe</a>
+        <a href="${settingsUrl}" style="color: #aaa;">${settingsText}</a> | <a href="${unsubUrl}" style="color: #aaa;">${unsubText}</a>
       </p>
     </div>
   `;
+
+  const plainUnsubText = isLithuanian ? 'Atsisakyti prenumeratos' : 'Unsubscribe';
+  const plainQuestionsText = isLithuanian 
+    ? 'Turite klausimų? Tiesiog atsakykite į šį laišką.'
+    : 'Questions? Want to dive deeper? Just reply to this email.';
+  const personalDayPlain = isLithuanian ? 'Tavo diena' : 'Your day';
+  const universalPlain = isLithuanian ? 'Visuotinė' : 'Universal';
 
   const result = await sweegoSend({
     channel: 'email',
@@ -77,7 +95,7 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
     from: { email: config.sweego.fromEmail, name: config.sweego.fromName },
     subject: subject,
     'message-html': htmlBody,
-    'message-txt': `${horoscope}\n\n${numerology ? `Your day: ${numerology.personalDay} · Universal: ${numerology.universalDay}\n\n` : ''}Questions? Want to dive deeper? Just reply to this email.\n\nUnsubscribe: ${unsubUrl}`,
+    'message-txt': `${horoscope}\n\n${numerology ? `${personalDayPlain}: ${numerology.personalDay} · ${universalPlain}: ${numerology.universalDay}\n\n` : ''}${plainQuestionsText}\n\n${settingsText}: ${settingsUrl}\n${plainUnsubText}: ${unsubUrl}`,
     'campaign-type': 'transac',
     'dry-run': false,
   });
@@ -159,6 +177,8 @@ function mdToHtml(md) {
 
 export async function sendRichWelcomeEmail(user, { subject, preheader, reading, technical_section, numerology }) {
   const unsubUrl = `${config.appUrl}/unsubscribe/${user.unsub_token}`;
+  const settingsUrl = `${config.appUrl}/settings/${user.unsub_token}`;
+  const isLithuanian = user.language === 'lt';
 
   const readingHtml = mdToHtml(reading);
   const techHtml = technical_section
@@ -166,17 +186,30 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
     .replace(/\n/g, '<br>');
 
   const M = numerology?.meanings || {};
+  const numbersTitle = isLithuanian ? 'Tavo skaičiai' : 'Your Numbers';
+  const lifePathLabel = isLithuanian ? 'Gyvenimo kelias' : 'Life Path';
+  const birthdayLabel = isLithuanian ? 'Gimtadienis' : 'Birthday';
+  const expressionLabel = isLithuanian ? 'Išraiška' : 'Expression';
+  const soulUrgeLabel = isLithuanian ? 'Sielos poreikis' : 'Soul Urge';
+  const yearLabel = isLithuanian ? 'Tavo 2026' : 'Your 2026';
+  const chartDataTitle = isLithuanian ? 'Tavo horoskopu duomenys' : 'Your Chart Data';
+  const tomorrowText = isLithuanian 
+    ? 'Rytoj ryte atvyks tavo pirmasis kasdieninis skaitymas. ☽'
+    : 'Tomorrow morning, your first daily reading arrives. ☽';
+  const unsubText = isLithuanian ? 'Atsisakyti prenumeratos' : 'Unsubscribe';
+  const settingsText = isLithuanian ? 'Nustatymai' : 'Settings';
+
   const numBlock = numerology ? `
       <div style="background: #fdf6f0; border-radius: 8px; padding: 20px 24px; margin: 30px 0; border-left: 3px solid #c9873a;">
         <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #c9873a; margin: 0 0 14px; font-weight: 600;">
-          Your Numbers
+          ${numbersTitle}
         </p>
         <table style="font-family: Georgia, serif; font-size: 15px; color: #444; border-collapse: collapse; width: 100%;">
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🔢 Life Path</td><td style="padding: 4px 0;"><strong>${numerology.lifePath}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.lifePath] || ''}</span></td></tr>
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🎂 Birthday</td><td style="padding: 4px 0;"><strong>${numerology.birthday}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.birthday] || ''}</span></td></tr>
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">✨ Expression</td><td style="padding: 4px 0;"><strong>${numerology.expression}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.expression] || ''}</span></td></tr>
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">💜 Soul Urge</td><td style="padding: 4px 0;"><strong>${numerology.soulUrge}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.soulUrge] || ''}</span></td></tr>
-          <tr style="border-top: 1px solid #e8d5c4;"><td style="padding: 8px 12px 4px 0; white-space: nowrap;">📅 Your 2026</td><td style="padding: 8px 0 4px;"><strong>${numerology.personalYear}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.personalYear] || ''}</span></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🔢 ${lifePathLabel}</td><td style="padding: 4px 0;"><strong>${numerology.lifePath}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.lifePath] || ''}</span></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🎂 ${birthdayLabel}</td><td style="padding: 4px 0;"><strong>${numerology.birthday}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.birthday] || ''}</span></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">✨ ${expressionLabel}</td><td style="padding: 4px 0;"><strong>${numerology.expression}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.expression] || ''}</span></td></tr>
+          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">💜 ${soulUrgeLabel}</td><td style="padding: 4px 0;"><strong>${numerology.soulUrge}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.soulUrge] || ''}</span></td></tr>
+          <tr style="border-top: 1px solid #e8d5c4;"><td style="padding: 8px 12px 4px 0; white-space: nowrap;">📅 ${yearLabel}</td><td style="padding: 8px 0 4px;"><strong>${numerology.personalYear}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.personalYear] || ''}</span></td></tr>
         </table>
       </div>` : '';
 
@@ -194,23 +227,25 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
 
       <div style="background: #f8f6fc; border-radius: 8px; padding: 20px 24px; margin: 30px 0; border-left: 3px solid #6b4c9a;">
         <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #6b4c9a; margin: 0 0 12px; font-weight: 600;">
-          Your Chart Data
+          ${chartDataTitle}
         </p>
         <pre style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.8; color: #444; margin: 0; white-space: pre-wrap;">${techHtml}</pre>
       </div>
 
       <p style="font-size: 15px; color: #888; margin-top: 30px; text-align: center;">
-        <em>Tomorrow morning, your first daily reading arrives. ☽</em>
+        <em>${tomorrowText}</em>
       </p>
 
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
       <p style="font-size: 12px; color: #aaa; text-align: center;">
-        <a href="${unsubUrl}" style="color: #aaa;">Unsubscribe</a>
+        <a href="${settingsUrl}" style="color: #aaa;">${settingsText}</a> | <a href="${unsubUrl}" style="color: #aaa;">${unsubText}</a>
       </p>
     </div>
   `;
 
-  const plainText = reading + '\n\n---\n\n' + technical_section + '\n\nUnsubscribe: ' + unsubUrl;
+  const plainUnsubText = isLithuanian ? 'Atsisakyti prenumeratos' : 'Unsubscribe';
+  const plainSettingsText = isLithuanian ? 'Nustatymai' : 'Settings';
+  const plainText = reading + '\n\n---\n\n' + technical_section + `\n\n${plainSettingsText}: ${settingsUrl}\n${plainUnsubText}: ${unsubUrl}`;
 
   return sweegoSend({
     channel: 'email',

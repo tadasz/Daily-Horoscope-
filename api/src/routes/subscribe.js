@@ -7,7 +7,7 @@ import { geocodeCity } from '../services/geocode.js';
 
 export async function subscribeRoute(req, res) {
   try {
-    const { name, email, birth_date, birth_time, birth_city, birth_lat, birth_lng, timezone, focus_area, context } = req.body;
+    const { name, email, birth_date, birth_time, birth_city, birth_lat, birth_lng, timezone, focus_area, context, language } = req.body;
 
     if (!email || !birth_date || !name) {
       return res.status(400).json({ error: 'Name, email, and birth date are required.' });
@@ -56,8 +56,8 @@ export async function subscribeRoute(req, res) {
     // Insert user
     const result = await query(`
       INSERT INTO users (email, name, birth_date, birth_time, birth_city, birth_lat, birth_lng, timezone,
-                         natal_chart, sun_sign, moon_sign, rising_sign, focus_area, initial_context)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+                         natal_chart, sun_sign, moon_sign, rising_sign, focus_area, initial_context, language)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING id, unsub_token, sun_sign, moon_sign, rising_sign
     `, [
       email, name, birth_date,
@@ -72,6 +72,7 @@ export async function subscribeRoute(req, res) {
       natalChart?.rising_sign || null,
       focus_area || null,
       context || null,
+      language || 'en',
     ]);
 
     const user = result.rows[0];
@@ -87,7 +88,7 @@ export async function subscribeRoute(req, res) {
       const persYear = personalYear(month, day, new Date().getUTCFullYear());
 
       const welcomeData = await generateWelcomeReading(
-        { name, focus_area, initial_context: context },
+        { name, focus_area, initial_context: context, language: language || 'en' },
         natalChart,
         currentSky
       );

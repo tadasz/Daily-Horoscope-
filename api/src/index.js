@@ -5,6 +5,7 @@ import { subscribeRoute } from './routes/subscribe.js';
 import { webhookRoute } from './routes/webhook.js';
 import { unsubscribeRoute } from './routes/unsubscribe.js';
 import { testDailyRoute } from './routes/test.js';
+import { getSettingsRoute, updateSettingsRoute } from './routes/settings.js';
 import { setupDailyCron } from './cron/dailyHoroscope.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -20,11 +21,22 @@ const landingDir = path.resolve(__dirname, '../landing');
 app.use(express.static(landingDir));
 app.get('/', (req, res) => res.sendFile('index.html', { root: landingDir }));
 
+// Serve Lithuanian page
+app.use('/lt', express.static(path.resolve(__dirname, '../landing/lt')));
+app.get('/lt', (req, res) => res.sendFile('index.html', { root: path.resolve(__dirname, '../landing/lt') }));
+
 // API routes
 app.post('/subscribe', subscribeRoute);
 app.post('/webhook/email', webhookRoute);
 app.get('/unsubscribe/:token', unsubscribeRoute);
 app.post('/test/daily', testDailyRoute);
+app.get('/api/settings/:token', getSettingsRoute);
+app.put('/api/settings/:token', updateSettingsRoute);
+
+// Settings page
+app.get('/settings/:token', (req, res) => {
+  res.sendFile('settings.html', { root: landingDir });
+});
 
 // Health check
 app.get('/health', async (req, res) => {

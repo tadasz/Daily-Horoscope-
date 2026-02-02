@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GATO — Asmeninis kasdieninis horoskopas el. paštu</title>
+  <meta name="description" content="Nemokamas kasdieninis horoskopas el. paštu, paremtas tavo tikru gimimo horoskopu. Tikros planetų pozicijos, ne bendriniai zodiako skaitymai. Pristatomas kiekvieną rytą.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <span class="logo-icon">🐱</span>
+        <span class="logo-text">GATO</span>
+      </div>
+      <p class="tagline">Asmeninė Astrologija, Sukurta Tau</p>
+      
+      <h1>Kasdieninis horoskopas el. paštu<br>parašytas tik tau</h1>
+      
+      <p class="desc">
+        Kiekvieną rytą skaitome dangų ir parašome tau trumpą, 
+        asmeninį skaityma, paremtą tavo <em>tikru gimimo horoskopu</em> 
+        ir šiandienos planetų pozicijomis. Ne bendriniai zodiako skaitymai — 
+        tikra astrologija, pristatyta į tavo el. pašto dėžutę.
+      </p>
+      
+      <div class="how-it-works">
+        <div class="step">☽ <strong>Skaitome tavo gimimo dangų</strong> — tikslų dangų, kai gimei</div>
+        <div class="step">✨ <strong>Kiekvieną rytą — asmeninis laiškas</strong> — tavo skaitymas šiai dienai</div>
+        <div class="step">🔢 <strong>Astrologija + numerologija</strong> — tavo dienos skaičius ir kosminė energija</div>
+      </div>
+    </header>
+
+    <form action="/subscribe" method="POST" class="signup-form">
+      <input type="hidden" name="language" value="lt">
+      
+      <div class="field">
+        <label for="name">Vardas</label>
+        <input type="text" id="name" name="name" required placeholder="pvz., Luna">
+      </div>
+
+      <div class="field">
+        <label for="email">El. paštas</label>
+        <input type="email" id="email" name="email" required placeholder="tu@example.com">
+      </div>
+
+      <div class="field">
+        <label for="birth_date">
+          Gimimo data
+          <span class="tip-wrap">
+            <span class="tip-icon">?</span>
+            <span class="tip-text">Tavo gimimo data nustato tavo Saulės ženklą (pagrindinis tapatumas), Mėnulio ženklą (emocijos) ir planetų pozicijas, kurios formuoja tavo asmenybę. Tai viso tavo horoskopo pagrindas.</span>
+          </span>
+        </label>
+        <input type="date" id="birth_date" name="birth_date" required>
+      </div>
+
+      <div class="field">
+        <label for="birth_time">
+          Gimimo laikas
+          <span class="tip-wrap">
+            <span class="tip-icon">?</span>
+            <span class="tip-text">Tavo gimimo laikas nustato tavo Kylantį ženklą — žvaigždyną horizonte tą akimirką, kai gimei. Tai formuoja, kaip pasaulis tave mato ir kurios gyvenimo sritys yra paveiktos kiekvienos planetos. Net 30 minučių daro skirtumą. Nežinai? Nieko — naudosime vidudienį ir vis tiek duosime puikų skaityma.</span>
+          </span>
+          <span class="optional">(neprivaloma)</span>
+        </label>
+        <input type="time" id="birth_time" name="birth_time">
+      </div>
+
+      <div class="field">
+        <label for="birth_city">
+          Gimimo miestas
+          <span class="tip-wrap">
+            <span class="tip-icon">?</span>
+            <span class="tip-text">Tavo gimimo vieta paveiks tavo Kylantį ženklą ir namų išdėstyma. Žmogus, gimęs tą pačią minutę Tokijuje ir Londone, turės skirtingus horoskopu — dangus atrodo skirtingai iš kiekvieno Žemės taško.</span>
+          </span>
+        </label>
+        <input type="text" id="birth_city" name="birth_city" placeholder="pvz., Vilnius, Lietuva">
+      </div>
+
+      <div class="field">
+        <label>Kuri gyvenimo sritis tau svarbiausia dabar?</label>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="focus_area" value="love"> Meilė</label>
+          <label class="radio"><input type="radio" name="focus_area" value="career" checked> Karjera</label>
+          <label class="radio"><input type="radio" name="focus_area" value="health"> Sveikata</label>
+          <label class="radio"><input type="radio" name="focus_area" value="growth"> Asmeninis augimas</label>
+          <label class="radio"><input type="radio" name="focus_area" value="money"> Pinigai</label>
+        </div>
+      </div>
+
+      <button type="submit" class="cta">✨ Gauti nemokamą kasdieninį horoskopa</button>
+
+      <p class="fine-print">100% nemokamai. Vienas laiškas per dieną. Atsisakyti galite bet kada.</p>
+    </form>
+
+    <section class="faq">
+      <h2>Kuo tai skiriasi?</h2>
+      
+      <details>
+        <summary>Kuo GATO skiriasi nuo kitų horoskopų?</summary>
+        <p>Dauguma horoskopų rašomi tavo Saulės ženklui — vienas iš 12 bendrų skaitymų, kurį dalijasi ~600 milijonų žmonių. GATO skaičiuoja tavo pilną gimimo horoskopa naudodamas Swiss Ephemeris (tą patį įrankį, kurį naudoja profesionalūs astrologai) ir skaito, kaip šiandienos tikros planetų pozicijos sąveikauja su <em>tavo</em> unikaliu horoskopu. Kiekvienas skaitymas parašytas vienam žmogui: tau.</p>
+      </details>
+
+      <details>
+        <summary>Kas yra gimimo horoskopas?</summary>
+        <p>Gimimo horoskopas yra dangaus žemėlapis tikslią gimimo akimirka ir vietoje. Jis rodo, kur buvo kiekviena planeta — kuris zodiako ženklas, kiek laipsnių, kuris "namas" (gyvenimo sritis). Galvok apie tai kaip apie tavo kosminį pirštų atspaudą. Nėra dviejų vienodų horoskopų, nebent gimei tuo pačiu laiku ir vietoje.</p>
+      </details>
+      
+      <details>
+        <summary>Ką reiškia "tikros planetų pozicijos"?</summary>
+        <p>Naudojame astronomijos efemeridos duomenis — tą pačią matematiką, kurią NASA naudoja planetoms sekti. Kai sakome "Marsas šiandien kvadratu su tavo gimimo Mėnuliu", tai tikras geometrinis santykis, vykstantis danguje dabar, palyginti su tuo, kur buvo Mėnulis, kai gimei. Ne nuotaikos — matematika.</p>
+      </details>
+      
+      <details>
+        <summary>Kodėl reikia mano gimimo laiko ir miesto?</summary>
+        <p>Tavo gimimo laikas nustato tavo <strong>Kylantį ženklą</strong> (Ascedentas) — kuris keičiasi kas ~2 valandas. Tavo miestas nustato, kuri dangaus dalis buvo matoma. Kartu jie nustato tavo "namų sistemą" — kurios planetos valdo kurias gyvenimo sritis (karjera, meilė, pinigai ir t.t.). Be jų vis dar galime duoti puikų skaityma, tik mažiau specifinį apie gyvenimo sritis.</p>
+      </details>
+
+      <details>
+        <summary>O kaip dėl numerologijos?</summary>
+        <p>Kiekvienas laiškas apima numerologijos skaičius, apskaičiuotus iš tavo gimimo datos ir šiandienos datos. Tavo <strong>Gyvenimo Kelio skaičius</strong> (tavo gyvenimo tikslas), <strong>Asmeninis Dienos skaičius</strong> (šiandienos energija tau) ir <strong>Visuotinis Dienos skaičius</strong> (kolektyvinė energija). Visa tikra Pitagoro numerologija — jokių atsitiktinių skaičių.</p>
+      </details>
+
+      <details>
+        <summary>Ar tai tikrai nemokamai?</summary>
+        <p>Taip. Gausi pilną gimimo horoskopo skaityma, kai užsiregistruosi, ir personalizuotą kasdieninį horoskopa kiekvieną rytą. Nemokamai amžinai. Vėliau galime pasiūlyti premium lygį su gilesniais skaitymais, bet kasdieninis laiškas lieka nemokamas.</p>
+      </details>
+    </section>
+
+    <footer>
+      <p>🐱 GATO — Asmeninė Astrologija, Sukurta Tau</p>
+      <p>Sukurta su tikra astronomija. Varomai Swiss Ephemeris.</p>
+    </footer>
+  </div>
+</body>
+</html>

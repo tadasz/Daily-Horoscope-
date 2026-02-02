@@ -24,7 +24,7 @@ export function setupDailyCron() {
 export async function runDailyHoroscopes() {
   const startTime = Date.now();
   
-  // Get all subscribed users
+  // Get all subscribed users with language
   const users = await query('SELECT * FROM users WHERE subscribed = TRUE');
   console.log(`Found ${users.rows.length} subscribed users`);
 
@@ -66,7 +66,9 @@ export async function runDailyHoroscopes() {
 
       // Prepend today's date to subject (e.g. "Feb 1 · ☽ Your career focus today")
       const now = new Date();
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = user.language === 'lt' 
+        ? ['Sau', 'Vas', 'Kov', 'Bal', 'Geg', 'Bir', 'Lie', 'Rgp', 'Rgs', 'Spa', 'Lap', 'Grd']
+        : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const datePrefix = `${monthNames[now.getUTCMonth()]} ${now.getUTCDate()}`;
       horoscope.subject = `${datePrefix} · ${horoscope.subject}`;
 
