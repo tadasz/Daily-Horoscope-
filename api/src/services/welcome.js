@@ -211,7 +211,7 @@ export async function generateWelcomeReading(user, natalChart, currentSky) {
   const systemPrompt = user.language === 'lt' ? SYSTEM_WELCOME_LT : SYSTEM_WELCOME;
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: user.language === 'lt' ? 'claude-sonnet-4-20250514' : 'claude-3-haiku-20240307',
     max_tokens: 2000,
     system: systemPrompt,
     messages: [{ role: 'user', content: chartData }],

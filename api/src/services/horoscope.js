@@ -142,15 +142,17 @@ ${generateLabel}`;
     systemPrompt = SYSTEM_FREE;
   }
 
+  // Sonnet for Lithuanian (better quality), Haiku for English (fast + cheap)
+  const model = isLithuanian ? 'claude-sonnet-4-20250514' : 'claude-3-haiku-20240307';
+
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model,
     max_tokens: 500,
     system: systemPrompt,
     messages: [{ role: 'user', content: prompt }],
   });
 
   let text = response.content[0].text;
-  // Strip markdown code blocks if present
   text = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
   return JSON.parse(text);
 }
@@ -169,7 +171,7 @@ Their reply: "${replyText}"
 Generate a warm follow-up and extract a key insight.`;
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model: user.language === 'lt' ? 'claude-sonnet-4-20250514' : 'claude-3-haiku-20240307',
     max_tokens: 400,
     system: SYSTEM_FOLLOWUP,
     messages: [{ role: 'user', content: prompt }],
