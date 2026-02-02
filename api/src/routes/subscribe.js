@@ -10,7 +10,8 @@ const welcomeStatus = new Map();
 
 export async function subscribeRoute(req, res) {
   try {
-    const { name, email, birth_date, birth_time, birth_city, birth_lat, birth_lng, timezone, focus_area, context, language } = req.body;
+    const { name, email, birth_date, birth_time, birth_city, birth_lat, birth_lng, timezone, focus_area, context, language,
+            quiz_style, quiz_length, quiz_relationship, quiz_read_time } = req.body;
 
     if (!email || !birth_date || !name) {
       return res.status(400).json({ error: 'Name, email, and birth date are required.' });
@@ -76,6 +77,16 @@ export async function subscribeRoute(req, res) {
 
     const user = result.rows[0];
     const token = user.unsub_token;
+
+    // Save quiz preferences if provided
+    if (quiz_style || quiz_length || quiz_relationship || quiz_read_time) {
+      await query(
+        `UPDATE users SET quiz_style = COALESCE($2, quiz_style), quiz_length = COALESCE($3, quiz_length),
+         quiz_relationship = COALESCE($4, quiz_relationship), quiz_read_time = COALESCE($5, quiz_read_time)
+         WHERE id = $1`,
+        [user.id, quiz_style || null, quiz_length || null, quiz_relationship || null, quiz_read_time || null]
+      );
+    }
 
     // Set initial status
     welcomeStatus.set(token, { status: 'generating', sun_sign: natalChart?.sun_sign });

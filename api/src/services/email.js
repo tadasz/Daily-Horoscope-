@@ -87,6 +87,14 @@ export async function sendHoroscopeEmail(user, { subject, horoscope, preheader }
         <em>${questionsText}</em>
       </p>
       ${techBlock}
+      ${!user.premium ? `
+      <div style="text-align: center; margin: 28px 0 8px; padding: 16px; background: #f9f5ff; border-radius: 10px;">
+        <p style="font-size: 14px; color: #6d28d9; margin: 0;">
+          ✨ ${isLithuanian 
+            ? '<a href="' + config.appUrl + '/quiz?lang=lt" style="color: #6d28d9; font-weight: 600;">Pasirink Premium</a> — savaitiniai giluminiai skaitymai, asmeninis stilius ir daugiau. €7.99/mėn.'
+            : '<a href="' + config.appUrl + '/quiz?lang=en" style="color: #6d28d9; font-weight: 600;">Go Premium</a> — weekly deep dives, your custom style & more. €7.99/mo.'}
+        </p>
+      </div>` : ''}
       <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0;">
       <p style="font-size: 12px; color: #aaa; text-align: center;">
         <a href="${feedbackUrl}" style="color: #aaa;">${feedbackText}</a> | <a href="${settingsUrl}" style="color: #aaa;">${settingsText}</a> | <a href="${unsubUrl}" style="color: #aaa;">${unsubText}</a>

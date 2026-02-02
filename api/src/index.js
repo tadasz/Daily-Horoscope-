@@ -44,6 +44,11 @@ app.get('/api/settings/:token', getSettingsRoute);
 app.put('/api/settings/:token', updateSettingsRoute);
 app.get('/api/welcome-status/:token', welcomeStatusRoute);
 
+// Quiz
+app.get('/quiz', (req, res) => {
+  res.sendFile('quiz.html', { root: landingDir });
+});
+
 // Welcome progress page
 app.get('/welcome/:token', (req, res) => {
   res.sendFile('welcome.html', { root: landingDir });

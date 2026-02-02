@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GATO — Discover Your Cosmic Style</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #8b5cf6, #c4b5fd);
+      transition: width 0.4s ease;
+      z-index: 100;
+    }
+
+    /* Slide container */
+    .quiz-wrap {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide {
+      position: absolute;
+      width: 100%;
+      max-width: 520px;
+      padding: 40px 24px;
+      opacity: 0;
+      transform: translateX(60px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+    }
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+      position: relative;
+    }
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+
+    /* Typography */
+    .slide-number {
+      color: #8b5cf6;
+      font-size: 0.8em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    h2 {
+      font-size: 1.5em;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .slide-desc {
+      color: #888;
+      font-size: 0.95em;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* Option cards */
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px;
+      background: rgba(139, 92, 246, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .option:hover {
+      background: rgba(139, 92, 246, 0.12);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+    .option.selected {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: #8b5cf6;
+    }
+    .option-icon { font-size: 1.3em; flex-shrink: 0; margin-top: 2px; }
+    .option-text { flex: 1; }
+    .option-label { font-weight: 500; font-size: 0.95em; }
+    .option-preview {
+      color: #888;
+      font-size: 0.82em;
+      margin-top: 4px;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    /* Multi-select */
+    .multi-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(139, 92, 246, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9em;
+      user-select: none;
+    }
+    .multi-option:hover { background: rgba(139, 92, 246, 0.12); }
+    .multi-option.selected {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: #8b5cf6;
+    }
+    .multi-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* Inputs */
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 0.85em;
+      color: #999;
+      margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 10px;
+      color: #e0e0e0;
+      font-size: 1em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: #8b5cf6;
+    }
+    .form-group input::placeholder { color: #555; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+
+    /* Buttons */
+    .btn-next {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 14px 36px;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .btn-next:hover { transform: scale(1.03); }
+    .btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-back {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 0;
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 0.85em;
+      cursor: pointer;
+    }
+    .btn-back:hover { color: #999; }
+
+    /* Paywall */
+    .plan-cards { display: flex; gap: 12px; margin-top: 20px; }
+    .plan-card {
+      flex: 1;
+      padding: 20px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      position: relative;
+    }
+    .plan-free {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .plan-premium {
+      background: rgba(139, 92, 246, 0.1);
+      border: 2px solid #8b5cf6;
+    }
+    .plan-card:hover { transform: translateY(-2px); }
+    .plan-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #8b5cf6;
+      color: #fff;
+      font-size: 0.7em;
+      padding: 3px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .plan-price {
+      font-size: 1.8em;
+      font-weight: 700;
+      margin: 8px 0;
+    }
+    .plan-price small { font-size: 0.45em; color: #999; font-weight: 400; }
+    .plan-period { color: #888; font-size: 0.8em; }
+    .plan-features {
+      text-align: left;
+      margin-top: 16px;
+      font-size: 0.85em;
+      line-height: 1.8;
+    }
+    .plan-features .has { color: #c4b5fd; }
+    .plan-features .no { color: #444; text-decoration: line-through; }
+
+    /* Language toggle */
+    .lang-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 50;
+      display: flex;
+      gap: 4px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      border: none;
+      background: none;
+      color: #666;
+      font-size: 0.8em;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .lang-btn.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c4b5fd;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progress"></div>
+
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('lt')">LT</button>
+  </div>
+
+  <div class="quiz-wrap">
+    <!-- Slide 1: Style -->
+    <div class="slide active" data-slide="1">
+      <div class="slide-number" data-i18n="step">Step 1 of 7</div>
+      <h2 data-i18n="s1_title">How should your readings feel?</h2>
+      <p class="slide-desc" data-i18n="s1_desc">Pick the voice that resonates with you.</p>
+      <div class="options" data-field="style">
+        <div class="option" data-value="mystic">
+          <span class="option-icon">🌙</span>
+          <div class="option-text">
+            <div class="option-label" data-i18n="s1_mystic">Mystic & poetic</div>
+            <div class="option-preview" data-i18n="s1_mystic_ex">"The Moon whispers through your seventh house today, opening a door you thought was sealed..."</div>
+          </div>
+        </div>
+        <div class="option" data-value="practical">
+          <span class="option-icon">🔬</span>
+          <div class="option-text">
+            <div class="option-label" data-i18n="s1_practical">Grounded & practical</div>
+            <div class="option-preview" data-i18n="s1_practical_ex">"Mars trines your natal Jupiter — good day for big decisions. Trust your gut on career moves."</div>
+          </div>
+        </div>
+        <div class="option" data-value="casual">
+          <span class="option-icon">💬</span>
+          <div class="option-text">
+            <div class="option-label" data-i18n="s1_casual">Casual & friendly</div>
+            <div class="option-preview" data-i18n="s1_casual_ex">"Hey! Venus is vibing with your chart today — perfect time to reach out to someone you've been thinking about."</div>
+          </div>
+        </div>
+        <div class="option" data-value="direct">
+          <span class="option-icon">🔥</span>
+          <div class="option-text">
+            <div class="option-label" data-i18n="s1_direct">Direct & bold</div>
+            <div class="option-preview" data-i18n="s1_direct_ex">"Saturn square your Sun. Stop procrastinating. That hard conversation? Have it today."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: Length -->
+    <div class="slide" data-slide="2">
+      <div class="slide-number" data-i18n="step2">Step 2 of 7</div>
+      <h2 data-i18n="s2_title">How deep should we go?</h2>
+      <p class="slide-desc" data-i18n="s2_desc">Pick your ideal reading length.</p>
+      <div class="options" data-field="length">
+        <div class="option" data-value="short">
+          <span class="option-icon">☕</span>
+          <div class="option-text">
+            <div class="option-label" data-i18n="s2_short">Quick sip</div>
+            <div class="option-preview" data-i18n="s2_short_ex">2–3 sentences. Just the cosmic headline.</div>
+          </div>
+        </div>
+        <div class="option" data-value="medium">
+          <span class="option-icon">📖</span>
+          <div class="option-text">
+            <div class="option-label" data-i18n="s2_medium">Morning read</div>
+            <div class="option-preview" data-i18n="s2_medium_ex">A solid paragraph with context and guidance.</div>
+          </div>
+        </div>
+        <div class="option" data-value="long">
+          <span class="option-icon">🔮</span>
+          <div class="option-text">
+            <div class="option-label" data-i18n="s2_long">Deep dive</div>
+            <div class="option-preview" data-i18n="s2_long_ex">Detailed analysis with planetary aspects and actionable insight.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: Life focus (multi-select) -->
+    <div class="slide" data-slide="3">
+      <div class="slide-number" data-i18n="step3">Step 3 of 7</div>
+      <h2 data-i18n="s3_title">What's happening in your life?</h2>
+      <p class="slide-desc" data-i18n="s3_desc">Select all that apply. This shapes what we focus on.</p>
+      <div class="multi-wrap" data-field="focus" data-multi="true">
+        <div class="multi-option" data-value="career"><span>💼</span> <span data-i18n="s3_career">Career & work</span></div>
+        <div class="multi-option" data-value="love"><span>❤️</span> <span data-i18n="s3_love">Love & relationships</span></div>
+        <div class="multi-option" data-value="growth"><span>🌱</span> <span data-i18n="s3_growth">Personal growth</span></div>
+        <div class="multi-option" data-value="money"><span>💰</span> <span data-i18n="s3_money">Money & stability</span></div>
+        <div class="multi-option" data-value="family"><span>🏠</span> <span data-i18n="s3_family">Home & family</span></div>
+        <div class="multi-option" data-value="adventure"><span>✈️</span> <span data-i18n="s3_adventure">Adventure & travel</span></div>
+        <div class="multi-option" data-value="health"><span>🧘</span> <span data-i18n="s3_health">Health & wellness</span></div>
+        <div class="multi-option" data-value="creativity"><span>🎨</span> <span data-i18n="s3_creativity">Creativity</span></div>
+      </div>
+      <button class="btn-next" onclick="nextSlide()" data-i18n-btn="next">Continue →</button>
+      <br><button class="btn-back" onclick="prevSlide()" data-i18n-btn="back">← Back</button>
+    </div>
+
+    <!-- Slide 4: Relationship -->
+    <div class="slide" data-slide="4">
+      <div class="slide-number" data-i18n="step4">Step 4 of 7</div>
+      <h2 data-i18n="s4_title">Relationship status?</h2>
+      <p class="slide-desc" data-i18n="s4_desc">Helps us frame Venus and Mars transits for you.</p>
+      <div class="options" data-field="relationship">
+        <div class="option" data-value="single">
+          <span class="option-icon">🦋</span>
+          <div class="option-text"><div class="option-label" data-i18n="s4_single">Single</div></div>
+        </div>
+        <div class="option" data-value="dating">
+          <span class="option-icon">💫</span>
+          <div class="option-text"><div class="option-label" data-i18n="s4_dating">Dating</div></div>
+        </div>
+        <div class="option" data-value="relationship">
+          <span class="option-icon">❤️</span>
+          <div class="option-text"><div class="option-label" data-i18n="s4_relationship">In a relationship</div></div>
+        </div>
+        <div class="option" data-value="complicated">
+          <span class="option-icon">🌀</span>
+          <div class="option-text"><div class="option-label" data-i18n="s4_complicated">It's complicated</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Time preference -->
+    <div class="slide" data-slide="5">
+      <div class="slide-number" data-i18n="step5">Step 5 of 7</div>
+      <h2 data-i18n="s5_title">When do you read your horoscope?</h2>
+      <p class="slide-desc" data-i18n="s5_desc">We'll time the delivery just right.</p>
+      <div class="options" data-field="read_time">
+        <div class="option" data-value="morning">
+          <span class="option-icon">☀️</span>
+          <div class="option-text"><div class="option-label" data-i18n="s5_morning">Morning — with my coffee</div></div>
+        </div>
+        <div class="option" data-value="evening">
+          <span class="option-icon">🌙</span>
+          <div class="option-text"><div class="option-label" data-i18n="s5_evening">Evening — before bed</div></div>
+        </div>
+        <div class="option" data-value="whenever">
+          <span class="option-icon">🌟</span>
+          <div class="option-text"><div class="option-label" data-i18n="s5_whenever">Whenever — I'll check when I check</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: Signup info -->
+    <div class="slide" data-slide="6">
+      <div class="slide-number" data-i18n="step6">Step 6 of 7</div>
+      <h2 data-i18n="s6_title">Almost there — tell us about you</h2>
+      <p class="slide-desc" data-i18n="s6_desc">We need your birth info to calculate your real natal chart.</p>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label data-i18n="s6_name">Your name</label>
+          <input type="text" id="q-name" placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="s6_email">Email</label>
+          <input type="email" id="q-email" placeholder="you@email.com" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label data-i18n="s6_birthday">Birthday</label>
+          <input type="date" id="q-birthday" required>
+        </div>
+        <div class="form-group">
+          <label data-i18n="s6_city">Birth city</label>
+          <input type="text" id="q-city" placeholder="Vilnius" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label data-i18n="s6_time">Birth time <span style="color:#555">(optional, for full chart)</span></label>
+        <input type="time" id="q-time">
+      </div>
+
+      <button class="btn-next" id="signup-btn" onclick="submitQuiz()" data-i18n-btn="see_plan">See my cosmic plan ✨</button>
+      <br><button class="btn-back" onclick="prevSlide()" data-i18n-btn="back">← Back</button>
+    </div>
+
+    <!-- Slide 7: Paywall -->
+    <div class="slide" data-slide="7">
+      <div class="slide-number" data-i18n="step7">Step 7 of 7</div>
+      <h2 data-i18n="s7_title">Your cosmic profile is ready!</h2>
+      <p class="slide-desc" data-i18n="s7_desc">Choose how you want to experience GATO.</p>
+
+      <div class="plan-cards">
+        <div class="plan-card plan-free" onclick="choosePlan('free')">
+          <div class="plan-price" data-i18n="s7_free_price">Free<br><small data-i18n="s7_free_sub">forever</small></div>
+          <div class="plan-features">
+            <div class="has">✓ <span data-i18n="s7_f1">Daily reading</span></div>
+            <div class="has">✓ <span data-i18n="s7_f2">Natal chart</span></div>
+            <div class="has">✓ <span data-i18n="s7_f3">Numerology</span></div>
+            <div class="no">✗ <span data-i18n="s7_f4">Custom style</span></div>
+            <div class="no">✗ <span data-i18n="s7_f5">Weekly deep dive</span></div>
+            <div class="no">✗ <span data-i18n="s7_f6">Chat with GATO</span></div>
+          </div>
+          <button class="btn-next" style="background: rgba(255,255,255,0.1); margin-top: 16px; padding: 10px 24px; font-size: 0.9em;" data-i18n-btn="start_free">Start free</button>
+        </div>
+
+        <div class="plan-card plan-premium" onclick="choosePlan('premium')">
+          <div class="plan-badge" data-i18n="s7_badge">POPULAR</div>
+          <div class="plan-price">€7.99<br><small data-i18n="s7_prem_sub">/month</small></div>
+          <div class="plan-features">
+            <div class="has">✓ <span data-i18n="s7_p1">Everything in Free</span></div>
+            <div class="has">✓ <span data-i18n="s7_p2">Your chosen style</span></div>
+            <div class="has">✓ <span data-i18n="s7_p3">Weekly deep dive</span></div>
+            <div class="has">✓ <span data-i18n="s7_p4">Chat with GATO</span></div>
+            <div class="has">✓ <span data-i18n="s7_p5">Compatibility readings</span></div>
+            <div class="has">✓ <span data-i18n="s7_p6">Transit alerts</span></div>
+          </div>
+          <button class="btn-next" style="margin-top: 16px; padding: 10px 24px; font-size: 0.9em;" data-i18n-btn="go_premium">Go Premium ✨</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let current = 1;
+    const total = 7;
+    const answers = {};
+    let lang = 'en';
+    let signupToken = null;
+
+    // i18n
+    const lt = {
+      step: 'Žingsnis 1 iš 7', step2: 'Žingsnis 2 iš 7', step3: 'Žingsnis 3 iš 7',
+      step4: 'Žingsnis 4 iš 7', step5: 'Žingsnis 5 iš 7', step6: 'Žingsnis 6 iš 7', step7: 'Žingsnis 7 iš 7',
+      s1_title: 'Kaip turėtų skambėti tavo skaitymai?',
+      s1_desc: 'Pasirink balsą, kuris tau artimas.',
+      s1_mystic: 'Mistinis ir poetiškas',
+      s1_mystic_ex: '"Mėnulis šnabžda per tavo septintus namus, atverdamas duris, kurias manei užrakintas..."',
+      s1_practical: 'Praktiškas ir dalykiškas',
+      s1_practical_ex: '"Marsas trinu su tavo Jupiteriu — gera diena dideliems sprendimams. Pasitikėk intuicija karjeros klausimais."',
+      s1_casual: 'Draugiškas ir laisvas',
+      s1_casual_ex: '"Ei! Venera šiandien gerai dera su tavo žemėlapiu — puikus metas parašyti tam žmogui, apie kurį galvojai."',
+      s1_direct: 'Tiesus ir drąsus',
+      s1_direct_ex: '"Saturnas kvadrate su tavo Saule. Nustok vilkinti. Tas sunkus pokalbis? Turėk jį šiandien."',
+      s2_title: 'Kaip giliai nardysime?',
+      s2_desc: 'Pasirink idealų skaitymo ilgį.',
+      s2_short: 'Trumpas gurkšnis', s2_short_ex: '2–3 sakiniai. Tik kosminė antraštė.',
+      s2_medium: 'Rytinis skaitymas', s2_medium_ex: 'Solidi pastraipa su kontekstu ir patarimais.',
+      s2_long: 'Gilusis nardymas', s2_long_ex: 'Detali analizė su planetų aspektais ir praktinėmis įžvalgomis.',
+      s3_title: 'Kas vyksta tavo gyvenime?',
+      s3_desc: 'Pažymėk viską, kas tinka. Tai nulems, kur fokusuosimės.',
+      s3_career: 'Karjera ir darbas', s3_love: 'Meilė ir santykiai', s3_growth: 'Asmeninis augimas',
+      s3_money: 'Pinigai ir stabilumas', s3_family: 'Namai ir šeima', s3_adventure: 'Nuotykiai ir kelionės',
+      s3_health: 'Sveikata', s3_creativity: 'Kūrybiškumas',
+      s4_title: 'Santykių statusas?',
+      s4_desc: 'Padeda suformuoti Veneros ir Marso tranzitų interpretacijas.',
+      s4_single: 'Vienas/viena', s4_dating: 'Susitinkinėju', s4_relationship: 'Santykiuose', s4_complicated: 'Sudėtinga',
+      s5_title: 'Kada skaitai savo horoskopą?',
+      s5_desc: 'Parinkime tinkamą laiką.',
+      s5_morning: 'Ryte — su kava', s5_evening: 'Vakare — prieš miegą', s5_whenever: 'Kada pasitaiko',
+      s6_title: 'Beveik baigta — papasakok apie save',
+      s6_desc: 'Mums reikia tavo gimimo duomenų tikram gimimo žemėlapiui apskaičiuoti.',
+      s6_name: 'Tavo vardas', s6_email: 'El. paštas', s6_birthday: 'Gimtadienis', s6_city: 'Gimimo miestas',
+      s6_time: 'Gimimo laikas <span style="color:#555">(neprivaloma, pilnam žemėlapiui)</span>',
+      s7_title: 'Tavo kosminis profilis paruoštas!',
+      s7_desc: 'Pasirink, kaip nori patirti GATO.',
+      s7_free_price: 'Nemokama', s7_free_sub: 'visam laikui', s7_prem_sub: '/mėn.',
+      s7_badge: 'POPULIARU',
+      s7_f1: 'Kasdieninis skaitymas', s7_f2: 'Gimimo žemėlapis', s7_f3: 'Numerologija',
+      s7_f4: 'Pasirinktas stilius', s7_f5: 'Savaitinis giluminis skaitymas', s7_f6: 'Pokalbis su GATO',
+      s7_p1: 'Viskas, kas Nemokama', s7_p2: 'Tavo pasirinktas stilius', s7_p3: 'Savaitinis giluminis skaitymas',
+      s7_p4: 'Pokalbis su GATO', s7_p5: 'Suderinamumo skaitymai', s7_p6: 'Tranzitų įspėjimai',
+    };
+    const ltBtns = {
+      next: 'Tęsti →', back: '← Atgal', see_plan: 'Pamatyti mano kosminį planą ✨',
+      start_free: 'Pradėti nemokamai', go_premium: 'Pasirinkti Premium ✨',
+    };
+
+    function setLang(l) {
+      lang = l;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === l.toUpperCase()));
+      if (l === 'lt') {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (lt[key]) el.innerHTML = lt[key];
+        });
+        document.querySelectorAll('[data-i18n-btn]').forEach(el => {
+          const key = el.getAttribute('data-i18n-btn');
+          if (ltBtns[key]) el.textContent = ltBtns[key];
+        });
+      } else {
+        location.reload(); // Simplest way to reset to EN
+      }
+    }
+
+    // Check URL for lang
+    const urlLang = new URLSearchParams(window.location.search).get('lang');
+    if (urlLang === 'lt') setLang('lt');
+
+    // Navigation
+    function showSlide(n) {
+      const prev = document.querySelector('.slide.active');
+      const next = document.querySelector(`[data-slide="${n}"]`);
+      if (!next || next === prev) return;
+
+      const goingForward = n > current;
+      prev.classList.remove('active');
+      prev.classList.add('exit-left');
+      setTimeout(() => prev.classList.remove('exit-left'), 400);
+
+      next.classList.add('active');
+      current = n;
+      document.getElementById('progress').style.width = ((n / total) * 100) + '%';
+    }
+
+    function nextSlide() { if (current < total) showSlide(current + 1); }
+    function prevSlide() { if (current > 1) showSlide(current - 1); }
+
+    // Single-select options (auto-advance)
+    document.querySelectorAll('.options').forEach(group => {
+      const field = group.getAttribute('data-field');
+      group.querySelectorAll('.option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          group.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+          opt.classList.add('selected');
+          answers[field] = opt.getAttribute('data-value');
+          // Auto-advance after 300ms
+          setTimeout(() => {
+            if (current < total) showSlide(current + 1);
+          }, 300);
+        });
+      });
+    });
+
+    // Multi-select options
+    document.querySelectorAll('.multi-wrap').forEach(group => {
+      const field = group.getAttribute('data-field');
+      answers[field] = [];
+      group.querySelectorAll('.multi-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          opt.classList.toggle('selected');
+          const val = opt.getAttribute('data-value');
+          if (opt.classList.contains('selected')) {
+            answers[field].push(val);
+          } else {
+            answers[field] = answers[field].filter(v => v !== val);
+          }
+        });
+      });
+    });
+
+    // Submit quiz (signup)
+    async function submitQuiz() {
+      const name = document.getElementById('q-name').value.trim();
+      const email = document.getElementById('q-email').value.trim();
+      const birthday = document.getElementById('q-birthday').value;
+      const city = document.getElementById('q-city').value.trim();
+      const time = document.getElementById('q-time').value;
+
+      if (!name || !email || !birthday || !city) {
+        alert(lang === 'lt' ? 'Prašome užpildyti visus privalomus laukus.' : 'Please fill in all required fields.');
+        return;
+      }
+
+      const btn = document.getElementById('signup-btn');
+      btn.disabled = true;
+      btn.textContent = lang === 'lt' ? 'Skaičiuojame...' : 'Calculating...';
+
+      try {
+        const res = await fetch('/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            birth_date: birthday,
+            birth_city: city,
+            birth_time: time || undefined,
+            language: lang,
+            focus_area: (answers.focus || []).join(','),
+            // Quiz preferences
+            quiz_style: answers.style,
+            quiz_length: answers.length,
+            quiz_relationship: answers.relationship,
+            quiz_read_time: answers.read_time,
+          }),
+        });
+        const data = await res.json();
+        if (data.token) {
+          signupToken = data.token;
+          showSlide(7);
+        } else if (data.error) {
+          alert(data.error);
+          btn.disabled = false;
+          btn.textContent = lang === 'lt' ? 'Pamatyti mano kosminį planą ✨' : 'See my cosmic plan ✨';
+        }
+      } catch (e) {
+        alert(lang === 'lt' ? 'Kažkas nutiko. Bandykite dar kartą.' : 'Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.textContent = lang === 'lt' ? 'Pamatyti mano kosminį planą ✨' : 'See my cosmic plan ✨';
+      }
+    }
+
+    // Plan selection
+    async function choosePlan(plan) {
+      if (plan === 'free') {
+        // Go to welcome/progress page
+        window.location.href = '/welcome/' + signupToken + '?lang=' + lang;
+      } else {
+        // Create checkout and redirect
+        try {
+          const res = await fetch('/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: signupToken }),
+          });
+          const data = await res.json();
+          if (data.checkout_url) {
+            window.location.href = data.checkout_url;
+          } else {
+            alert('Could not create checkout. Starting free instead.');
+            window.location.href = '/welcome/' + signupToken + '?lang=' + lang;
+          }
+        } catch (e) {
+          window.location.href = '/welcome/' + signupToken + '?lang=' + lang;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
