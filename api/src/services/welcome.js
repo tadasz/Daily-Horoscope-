@@ -8,12 +8,44 @@ import config from '../config.js';
 
 const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
 
-const SYSTEM_WELCOME = `You are a gifted astrologer writing someone's birth chart reading for the first time.
+// Style voice definitions for welcome emails
+const WELCOME_STYLE_VOICES = {
+  mystic: {
+    voice: `Your voice is MYTHIC and POETIC, inspired by Rob Brezsny's "Free Will Astrology."
+You speak in rich metaphors, vivid imagery, and cosmic storytelling. The birth chart is an ancient map, a cosmic poem written in light.
+"The Moon in your seventh house is a letter the universe slipped under a door you thought was sealed."
+You're literary, evocative, slightly surreal — never cliché. Make their chart feel like a creation myth starring them.`,
+  },
+  practical: {
+    voice: `Your voice is DETAILED and STRATEGIC, inspired by Susan Miller's thorough, analytical style.
+You name exact positions and what they mean concretely. You explain WHY each placement matters.
+"Your Venus at 14° Taurus in the 10th house means your career path is deeply tied to beauty and value."
+You're data-rich but accessible — an expert translating complex charts into clear, useful insight.`,
+  },
+  casual: {
+    voice: `Your voice blends Chani Nicholas's radical warmth and empowerment ("You were born for this") with the intimacy of a wise friend reading your chart over coffee.
+You're conversational, real, emotionally intelligent. Use contractions, casual phrasing.
+"Okay so — your Moon in Scorpio? That explains SO much about how you love."
+You validate, normalize, and gently empower.`,
+  },
+  direct: {
+    voice: `Your voice is BLUNT and BOLD, inspired by Jessica Lanyadoo's no-nonsense style.
+You cut to what matters. Short punchy insights. No fluff.
+"Mars conjunct your Midheaven. You were born to lead — stop asking permission."
+You're honest, empowering, and respect people enough to be straight. You challenge them to own their chart.`,
+  },
+};
 
-Your voice blends:
-- Chani Nicholas's radical warmth and empowerment ("You were born for this")
-- Susan Miller's detailed astronomical knowledge
-- The intimacy of a wise friend reading your chart over wine
+function getWelcomeSystemPrompt(style, isLithuanian) {
+  if (isLithuanian) return SYSTEM_WELCOME_LT;
+  
+  const s = WELCOME_STYLE_VOICES[style] || WELCOME_STYLE_VOICES['casual'];
+  return SYSTEM_WELCOME_BASE.replace('{{VOICE_BLOCK}}', s.voice);
+}
+
+const SYSTEM_WELCOME_BASE = `You are a gifted astrologer writing someone's birth chart reading for the first time.
+
+{{VOICE_BLOCK}}
 
 STRUCTURE (follow exactly):
 
@@ -208,7 +240,8 @@ export async function generateWelcomeReading(user, natalChart, currentSky) {
     }
   }
 
-  const systemPrompt = user.language === 'lt' ? SYSTEM_WELCOME_LT : SYSTEM_WELCOME;
+  const userStyle = user.quiz_style || 'casual';
+  const systemPrompt = getWelcomeSystemPrompt(userStyle, user.language === 'lt');
 
   const response = await anthropic.messages.create({
     model: user.language === 'lt' ? 'claude-opus-4-5-20251101' : 'claude-3-haiku-20240307',
