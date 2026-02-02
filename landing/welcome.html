@@ -161,6 +161,19 @@
         <p id="done-sub">Your first daily horoscope arrives tomorrow morning</p>
       </div>
       <p class="spam-note" id="spam-note">📮 Don't see it? Check your spam/junk folder and mark GATO as "not spam"</p>
+
+      <!-- Invite section -->
+      <div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:16px;padding:24px 20px;margin-top:28px;">
+        <h2 style="font-size:1.1em;margin-bottom:8px;color:#c4b5fd;" id="invite-title">🎁 Give a friend their first reading</h2>
+        <p style="color:#888;font-size:0.88em;margin-bottom:18px;line-height:1.5;" id="invite-desc">Know someone who'd love a personalized horoscope? Share the quiz — it takes 2 minutes and they'll get a free cosmic blueprint.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:10px;">
+            <a id="share-wa" href="#" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;background:#25D366;color:#fff;text-decoration:none;font-size:0.9em;font-weight:500;">📱 WhatsApp</a>
+            <a id="share-email" href="#" target="_blank" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;background:#6d28d9;color:#fff;text-decoration:none;font-size:0.9em;font-weight:500;">✉️ Email</a>
+          </div>
+          <button id="share-copy" onclick="copyShareLink()" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.08);color:#c4b5fd;border:1px solid rgba(139,92,246,0.25);font-size:0.9em;font-weight:500;cursor:pointer;">🔗 Copy link</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -255,7 +268,51 @@
       setTimeout(() => {
         document.getElementById('loading-view').style.display = 'none';
         document.getElementById('done-view').style.display = 'block';
+        setupShareLinks();
       }, 600);
+    }
+
+    function setupShareLinks() {
+      const shareUrl = window.location.origin + '/quiz' + (lang === 'lt' ? '?lang=lt' : '');
+      const msgs = {
+        en: {
+          wa: `Hey! I just found this really cool personalized horoscope — it's based on your actual birth chart, not just your sign. Try the quiz, it takes 2 min: ${shareUrl}`,
+          emailSubject: 'Check out your free cosmic reading ✨',
+          emailBody: `Hey!\n\nI found this personalized horoscope that's actually based on real astronomy and your birth chart. The quiz is fun and you get a free cosmic blueprint.\n\nTry it: ${shareUrl}\n\n✨`,
+        },
+        lt: {
+          wa: `Ei! Radau labai šaunų personalizuotą horoskopą — paremtą tavo tikru gimimo žemėlapiu, ne tik zodiako ženklu. Pabandyk viktoriną, užtrunka 2 min: ${shareUrl}`,
+          emailSubject: 'Pažiūrėk savo nemokamą kosminį portretą ✨',
+          emailBody: `Ei!\n\nRadau personalizuotą horoskopą, kuris paremtas tikra astronomija ir tavo gimimo žemėlapiu. Viktorina smagi ir gauni nemokamą kosminį portretą.\n\nPabandyk: ${shareUrl}\n\n✨`,
+        }
+      };
+      const m = msgs[lang] || msgs.en;
+      document.getElementById('share-wa').href = `https://wa.me/?text=${encodeURIComponent(m.wa)}`;
+      document.getElementById('share-email').href = `mailto:?subject=${encodeURIComponent(m.emailSubject)}&body=${encodeURIComponent(m.emailBody)}`;
+
+      if (lang === 'lt') {
+        document.getElementById('invite-title').textContent = '🎁 Padovanok draugui pirmą skaitymą';
+        document.getElementById('invite-desc').textContent = 'Pažįsti ką nors, kam patiktų asmeninis horoskopas? Pasidalink viktorina — užtrunka 2 minutes ir jie gaus nemokamą kosminį portretą.';
+        document.getElementById('share-copy').innerHTML = '🔗 Kopijuoti nuorodą';
+      }
+
+      window.shareUrl = shareUrl;
+    }
+
+    function copyShareLink() {
+      navigator.clipboard.writeText(window.shareUrl).then(() => {
+        const btn = document.getElementById('share-copy');
+        btn.innerHTML = '✓ ' + (lang === 'lt' ? 'Nukopijuota!' : 'Copied!');
+        btn.style.background = 'rgba(110,231,183,0.1)';
+        btn.style.borderColor = '#6ee7b7';
+        btn.style.color = '#6ee7b7';
+        setTimeout(() => {
+          btn.innerHTML = lang === 'lt' ? '🔗 Kopijuoti nuorodą' : '🔗 Copy link';
+          btn.style.background = 'rgba(255,255,255,0.08)';
+          btn.style.borderColor = 'rgba(139,92,246,0.25)';
+          btn.style.color = '#c4b5fd';
+        }, 2000);
+      });
     }
 
     // Poll for status
