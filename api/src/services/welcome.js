@@ -230,7 +230,11 @@ export async function generateWelcomeReading(user, natalChart, currentSky) {
   const houses = natalChart.houses || [];
   const aspects = natalChart.natal_aspects || [];
 
+  const birthDate = user.birth_date ? new Date(user.birth_date) : null;
+  const birthYear = birthDate ? birthDate.getFullYear() : null;
+
   let chartData = `Name: ${user.name}\n`;
+  if (birthYear) chartData += `Born: ${birthYear}\n`;
   chartData += `Sun: ${natalChart.sun_sign}, Moon: ${natalChart.moon_sign}, Rising: ${natalChart.rising_sign}\n`;
   chartData += `Moon phase at birth: ${natalChart.moon_phase_at_birth}\n`;
   chartData += `Focus area: ${user.focus_area || 'general growth'}\n`;

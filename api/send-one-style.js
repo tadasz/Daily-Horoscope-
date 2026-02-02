@@ -17,13 +17,14 @@ async function main() {
   const numerology = birthProfile(user.name, bd.getFullYear(), bd.getMonth() + 1, bd.getDate());
   numerology.meanings = NUMBER_MEANINGS;
 
-  const styledUser = { ...user, quiz_style: style, language: 'en' };
+  const lang = process.argv[3] || 'lt';
+  const styledUser = { ...user, quiz_style: style, language: lang };
   console.log(`Generating ${style}...`);
   const reading = await generateWelcomeReading(styledUser, natalChart, currentSky);
   console.log('Got reading, subject:', reading.subject);
   
   await sendRichWelcomeEmail(styledUser, {
-    subject: `[${style.toUpperCase()}] ${reading.subject}`,
+    subject: `[${lang.toUpperCase()}-${style.toUpperCase()}] ${reading.subject}`,
     preheader: reading.preheader,
     reading: reading.reading,
     technical_section: reading.technical_section,
