@@ -226,17 +226,53 @@ export async function sendRichWelcomeEmail(user, { subject, preheader, reading, 
   const settingsText = isLithuanian ? 'Nustatymai' : 'Settings';
   const feedbackText = isLithuanian ? 'Atsiliepimai' : 'Feedback';
 
+  const numIntro = isLithuanian
+    ? 'Numerologija apskaičiuoja tavo asmeninius skaičius pagal gimimo datą ir vardą. Kiekvienas skaičius atskleidžia skirtingą tavo asmenybės ir likimo aspektą.'
+    : 'Numerology calculates your personal numbers from your birth date and name. Each number reveals a different aspect of your personality and path.';
+
+  const numExplanations = isLithuanian ? {
+    lifePath: 'Tavo pagrindinis gyvenimo tikslas ir misija',
+    birthday: 'Tavo įgimtas talentas — dovana, su kuria gimei',
+    expression: 'Kaip tu reiškiesi pasaulyje ir ką kuri',
+    soulUrge: 'Ko tavo siela iš tikrųjų trokšta giliai viduje',
+    personalYear: 'Šių metų pagrindinė energija ir tema',
+  } : {
+    lifePath: 'Your core life purpose and mission',
+    birthday: 'Your innate talent — the gift you were born with',
+    expression: 'How you express yourself in the world',
+    soulUrge: 'What your soul truly desires deep down',
+    personalYear: 'This year\'s overarching energy and theme',
+  };
+
   const numBlock = numerology ? `
       <div style="background: #fdf6f0; border-radius: 8px; padding: 20px 24px; margin: 30px 0; border-left: 3px solid #c9873a;">
-        <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #c9873a; margin: 0 0 14px; font-weight: 600;">
+        <p style="font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #c9873a; margin: 0 0 10px; font-weight: 600;">
           ${numbersTitle}
         </p>
+        <p style="font-size: 14px; color: #777; margin: 0 0 16px; line-height: 1.5; font-style: italic;">
+          ${numIntro}
+        </p>
         <table style="font-family: Georgia, serif; font-size: 15px; color: #444; border-collapse: collapse; width: 100%;">
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🔢 ${lifePathLabel}</td><td style="padding: 4px 0;"><strong>${numerology.lifePath}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.lifePath] || ''}</span></td></tr>
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">🎂 ${birthdayLabel}</td><td style="padding: 4px 0;"><strong>${numerology.birthday}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.birthday] || ''}</span></td></tr>
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">✨ ${expressionLabel}</td><td style="padding: 4px 0;"><strong>${numerology.expression}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.expression] || ''}</span></td></tr>
-          <tr><td style="padding: 4px 12px 4px 0; white-space: nowrap;">💜 ${soulUrgeLabel}</td><td style="padding: 4px 0;"><strong>${numerology.soulUrge}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.soulUrge] || ''}</span></td></tr>
-          <tr style="border-top: 1px solid #e8d5c4;"><td style="padding: 8px 12px 4px 0; white-space: nowrap;">📅 ${yearLabel}</td><td style="padding: 8px 0 4px;"><strong>${numerology.personalYear}</strong> <span style="color: #888; font-size: 13px;">— ${M[numerology.personalYear] || ''}</span></td></tr>
+          <tr>
+            <td style="padding: 6px 12px 6px 0; white-space: nowrap; vertical-align: top;">🔢 ${lifePathLabel}</td>
+            <td style="padding: 6px 0;"><strong>${numerology.lifePath}</strong> — ${M[numerology.lifePath] || ''}<br><span style="color: #999; font-size: 12px;">${numExplanations.lifePath}</span></td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 12px 6px 0; white-space: nowrap; vertical-align: top;">🎂 ${birthdayLabel}</td>
+            <td style="padding: 6px 0;"><strong>${numerology.birthday}</strong> — ${M[numerology.birthday] || ''}<br><span style="color: #999; font-size: 12px;">${numExplanations.birthday}</span></td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 12px 6px 0; white-space: nowrap; vertical-align: top;">✨ ${expressionLabel}</td>
+            <td style="padding: 6px 0;"><strong>${numerology.expression}</strong> — ${M[numerology.expression] || ''}<br><span style="color: #999; font-size: 12px;">${numExplanations.expression}</span></td>
+          </tr>
+          <tr>
+            <td style="padding: 6px 12px 6px 0; white-space: nowrap; vertical-align: top;">💜 ${soulUrgeLabel}</td>
+            <td style="padding: 6px 0;"><strong>${numerology.soulUrge}</strong> — ${M[numerology.soulUrge] || ''}<br><span style="color: #999; font-size: 12px;">${numExplanations.soulUrge}</span></td>
+          </tr>
+          <tr style="border-top: 1px solid #e8d5c4;">
+            <td style="padding: 10px 12px 6px 0; white-space: nowrap; vertical-align: top;">📅 ${yearLabel}</td>
+            <td style="padding: 10px 0 6px;"><strong>${numerology.personalYear}</strong> — ${M[numerology.personalYear] || ''}<br><span style="color: #999; font-size: 12px;">${numExplanations.personalYear}</span></td>
+          </tr>
         </table>
       </div>` : '';
 
