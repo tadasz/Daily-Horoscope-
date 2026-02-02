@@ -143,13 +143,15 @@ ${generateLabel}`;
   }
 
   const response = await anthropic.messages.create({
-    model: 'claude-3-haiku-20240307',
+    model: 'claude-sonnet-4-20250514',
     max_tokens: 500,
     system: systemPrompt,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const text = response.content[0].text;
+  let text = response.content[0].text;
+  // Strip markdown code blocks if present
+  text = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
   return JSON.parse(text);
 }
 
@@ -167,12 +169,13 @@ Their reply: "${replyText}"
 Generate a warm follow-up and extract a key insight.`;
 
   const response = await anthropic.messages.create({
-    model: 'claude-3-haiku-20240307',
+    model: 'claude-sonnet-4-20250514',
     max_tokens: 400,
     system: SYSTEM_FOLLOWUP,
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const text = response.content[0].text;
-  return JSON.parse(text);
+  let text2 = response.content[0].text;
+  text2 = text2.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+  return JSON.parse(text2);
 }
